@@ -1,0 +1,3 @@
+Werkzeug>=0.9
+click==4.0
+python-easyconfig==0.1.0
