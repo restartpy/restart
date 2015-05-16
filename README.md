@@ -38,3 +38,24 @@ Consume the API now:
 $ curl http://127.0.0.1:5000/greeting
 {"hello": "world"}
 ```
+
+
+## Installation
+
+Install `RESTArt` with `pip`:
+
+    $ pip install Python-RESTArt
+
+Install development version from `GitHub`:
+
+    $ git clone https://github.com/RussellLuo/restart.git
+    $ cd restart
+    $ python setup.py install
+
+
+## License
+
+[MIT][1]
+
+
+[1]: http://opensource.org/licenses/MIT
