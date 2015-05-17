@@ -53,13 +53,13 @@ def register(cls=None, prefix=None, pk='<pk>',
              list_actions=None, item_actions=None):
     def decorator(cls):
         actual_prefix = prefix or '/%s' % cls.name
-        actual_list_actions = {'GET': 'read_list', 'DELETE': 'delete_list'}
+        actual_list_actions = {'GET': 'index'}
         if list_actions:
             actual_list_actions.update(list_actions)
 
         add_rule(cls, actual_prefix,
                  endpoint='%s_list' % cls.name,
-                 methods=['POST', 'GET', 'DELETE'],
+                 methods=['GET', 'POST'],
                  actions=actual_list_actions)
         add_rule(cls, '%s/%s' % (actual_prefix, pk),
                  endpoint='%s_item' % cls.name,

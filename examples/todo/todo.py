@@ -15,12 +15,8 @@ todos = {
 class Todo(Resource):
     name = 'todos'
 
-    def read_list(self, request):
+    def index(self, request):
         return todos.values()
-
-    def delete_list(self, request):
-        todos.clear()
-        return '', status.HTTP_204_NO_CONTENT
 
     def create(self, request):
         pk = len(todos) + 1

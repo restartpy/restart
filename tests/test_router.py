@@ -58,7 +58,7 @@ class TestRouter(object):
         list_rule = router.rules['users_list']
         self.assert_rule(
             list_rule,
-            ('/users', ['POST', 'GET', 'DELETE'], User)
+            ('/users', ['GET', 'POST'], User)
         )
 
         item_rule = router.rules['users_item']

@@ -22,4 +22,4 @@ Some example APIs based on `RESTArt`.
 
 ## APIs
 
-1. [Todo](todo/README.md)
+1. [Todo](todo)
