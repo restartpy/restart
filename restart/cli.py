@@ -1,12 +1,14 @@
 from __future__ import absolute_import
 
+import sys
+
 import click
 from werkzeug.routing import Map, Rule
-from werkzeug.utils import import_string
 from werkzeug.serving import run_simple
 
 from restart import router
 from restart.request import Request
+from restart.utils import load_resources
 
 
 class API(object):
@@ -42,11 +44,14 @@ class API(object):
 
 
 @click.command()
-@click.argument('entrypoint', required=True)
 @click.option('--host', '-h', default='127.0.0.1')
 @click.option('--port', '-p', default=5000)
 @click.option('--debug', '-d', default=False)
-def main(entrypoint, host, port, debug):
-    import_string(entrypoint)
+@click.argument('entrypoints', nargs=-1, required=True)
+def main(entrypoints, host, port, debug):
+    if '.' not in sys.path:
+        sys.path.insert(0, '.')
+    load_resources(entrypoints)
+
     api = API(router.rules)
-    api.run(host=host, port=port, debug=debug)
+    api.run(host, port, debug)
