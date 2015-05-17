@@ -13,10 +13,10 @@ class TestRouter(object):
         router.rules.clear()
 
     def assert_rule(self, result, expected):
-        uri, methods, resource_cls = expected
+        uri, methods, resource_class = expected
         assert result.uri == uri
         assert result.methods == methods
-        assert result.handler.resource_cls == resource_cls
+        assert result.handler.resource_class == resource_class
 
     def test_add_rule(self):
         class Dummy(Resource):

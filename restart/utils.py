@@ -19,13 +19,13 @@ def load_resources(entrypoints):
     """
     for entrypoint in entrypoints:
         if '*' in entrypoint:
-            real_entrypoints = expand_wildcards(entrypoint)
-            if not real_entrypoints:
+            actual_entrypoints = expand_wildcards(entrypoint)
+            if not actual_entrypoints:
                 raise ImportError(
                     'No module found with wildcards %r' % entrypoint
                 )
-            for real_entrypoint in real_entrypoints:
-                import_string(real_entrypoint)
+            for actual_entrypoint in actual_entrypoints:
+                import_string(actual_entrypoint)
         else:
             import_string(entrypoint)
 

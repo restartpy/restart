@@ -7,22 +7,22 @@ rules = {}
 
 
 class Rule(object):
-    def __init__(self, uri, methods, resource_cls, actions):
+    def __init__(self, uri, methods, resource_class, actions):
         self.uri = uri
         self.methods = methods or config.ACTION_MAP.keys()
-        self.handler = self._get_handler(resource_cls, actions)
+        self.handler = self._get_handler(resource_class, actions)
 
-    def _get_handler(self, resource_cls, actions):
+    def _get_handler(self, resource_class, actions):
         action_map = config.ACTION_MAP.copy()
         if actions:
             # Override `ACTION_MAP` by `actions`
             action_map.update(actions)
 
         def handler(request, *args, **kwargs):
-            resource = handler.resource_cls()
+            resource = handler.resource_class()
             return resource.dispatch_request(action_map, request, *args, **kwargs)
 
-        handler.resource_cls = resource_cls
+        handler.resource_class = resource_class
         return handler
 
     def __str__(self):
@@ -31,18 +31,18 @@ class Rule(object):
     __repr__ = __str__
 
 
-def add_rule(resource_cls, uri, endpoint, methods=None, actions=None):
+def add_rule(resource_class, uri, endpoint, methods=None, actions=None):
     if endpoint in rules:
         raise AssertionError('Endpoint name `%s` already exists' % endpoint)
 
-    rules[endpoint] = Rule(uri, methods, resource_cls, actions)
+    rules[endpoint] = Rule(uri, methods, resource_class, actions)
 
 
 def route(cls=None, uri=None, endpoint=None, methods=None, actions=None):
     def decorator(cls):
-        real_uri = uri or '/%s' % cls.name
-        real_endpoint = endpoint or cls.name
-        add_rule(cls, real_uri, real_endpoint, methods, actions)
+        actual_uri = uri or '/%s' % cls.name
+        actual_endpoint = endpoint or cls.name
+        add_rule(cls, actual_uri, actual_endpoint, methods, actions)
         return cls
     if cls:
         return decorator(cls)
@@ -52,16 +52,16 @@ def route(cls=None, uri=None, endpoint=None, methods=None, actions=None):
 def register(cls=None, prefix=None, pk='<pk>',
              list_actions=None, item_actions=None):
     def decorator(cls):
-        real_prefix = prefix or '/%s' % cls.name
-        real_list_actions = {'GET': 'read_list', 'DELETE': 'delete_list'}
+        actual_prefix = prefix or '/%s' % cls.name
+        actual_list_actions = {'GET': 'read_list', 'DELETE': 'delete_list'}
         if list_actions:
-            real_list_actions.update(list_actions)
+            actual_list_actions.update(list_actions)
 
-        add_rule(cls, real_prefix,
+        add_rule(cls, actual_prefix,
                  endpoint='%s_list' % cls.name,
                  methods=['POST', 'GET', 'DELETE'],
-                 actions=real_list_actions)
-        add_rule(cls, '%s/%s' % (real_prefix, pk),
+                 actions=actual_list_actions)
+        add_rule(cls, '%s/%s' % (actual_prefix, pk),
                  endpoint='%s_item' % cls.name,
                  methods=['GET', 'PUT', 'PATCH', 'DELETE'],
                  actions=item_actions)
