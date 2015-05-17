@@ -65,10 +65,20 @@ class TestUtils(object):
         assert str(exc.value) == expected_exc_msg
 
     def test_expand_wildcards(self):
-        real_entrypoints = expand_wildcards('testapi.resources.*.resource')
-        assert real_entrypoints == ['testapi.resources.users.resource',
-                                    'testapi.resources.orders.resource']
+        entrypoints = expand_wildcards('testapi.resources.*.resource')
+        assert entrypoints == ['testapi.resources.users.resource',
+                               'testapi.resources.orders.resource']
+
+        entrypoints = expand_wildcards('testapi.*.*.resource')
+        assert entrypoints == ['testapi.resources.users.resource',
+                               'testapi.resources.orders.resource']
 
     def test_expand_wildcards_with_nonexistent_entrypoint(self):
         entrypoints = expand_wildcards('testapi.resources.users.*.resource')
         assert not entrypoints
+
+    def test_expand_wildcards_package(self):
+        entrypoints = expand_wildcards('testapi.resources.*')
+        assert entrypoints == ['testapi.resources',
+                               'testapi.resources.users',
+                               'testapi.resources.orders']
