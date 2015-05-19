@@ -2,15 +2,12 @@ from __future__ import absolute_import
 
 import pytest
 
-from restart import router
+from restart.art import RESTArt
 from restart.resource import Resource
 from restart.config import config
 
 
-class TestRouter(object):
-
-    def teardown_method(self, method):
-        router.rules.clear()
+class TestArt(object):
 
     def assert_rule(self, result, expected):
         uri, methods, resource_class = expected
@@ -22,46 +19,52 @@ class TestRouter(object):
         class Dummy(Resource):
             name = 'dummy'
 
-        router.add_rule(Dummy, '/dummy', 'dummy')
-        assert 'dummy' in router.rules
+        art = RESTArt()
+        art.add_rule(Dummy, '/dummy', 'dummy')
+        assert 'dummy' in art.rules
 
-        rule = router.rules['dummy']
+        rule = art.rules['dummy']
         self.assert_rule(rule, ('/dummy', config.ACTION_MAP.keys(), Dummy))
 
     def test_add_rule_with_exsiting_endpoint(self):
         class Dummy(Resource):
             name = 'dummy'
 
-        router.add_rule(Dummy, '/dummy', 'dummy')
+        art = RESTArt()
+        art.add_rule(Dummy, '/dummy', 'dummy')
 
         with pytest.raises(AssertionError):
-            router.add_rule(Dummy, '/dummy', 'dummy')
+            art.add_rule(Dummy, '/dummy', 'dummy')
 
     def test_route(self):
-        @router.route(methods=['GET'])
+        art = RESTArt()
+
+        @art.route(methods=['GET'])
         class Item(Resource):
             name = 'item'
 
-        assert 'item' in router.rules
+        assert 'item' in art.rules
 
-        rule = router.rules['item']
+        rule = art.rules['item']
         self.assert_rule(rule, ('/item', ['GET'], Item))
 
     def test_register(self):
-        @router.register
+        art = RESTArt()
+
+        @art.register
         class User(Resource):
             name = 'users'
 
-        assert 'users_list' in router.rules
-        assert 'users_item' in router.rules
+        assert 'users_list' in art.rules
+        assert 'users_item' in art.rules
 
-        list_rule = router.rules['users_list']
+        list_rule = art.rules['users_list']
         self.assert_rule(
             list_rule,
             ('/users', ['GET', 'POST'], User)
         )
 
-        item_rule = router.rules['users_item']
+        item_rule = art.rules['users_item']
         self.assert_rule(
             item_rule,
             ('/users/<pk>', ['GET', 'PUT', 'PATCH', 'DELETE'], User)
