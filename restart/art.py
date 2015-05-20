@@ -6,15 +6,15 @@ from .utils import load_resources, locked_cached_property
 
 class RESTArt(object):
 
-    def __init__(self, import_name=None):
-        self.import_name = import_name
+    def __init__(self, module_names=None):
+        self.module_names = module_names
         self._rules = {}
 
     @locked_cached_property
     def rules(self):
-        # Load resources located in `import_name` if not in interactive mode
-        if self.import_name is not None and self.import_name != '__main__':
-            load_resources(self.import_name)
+        # Load resources located in `module_names` if specified
+        if self.module_names is not None:
+            load_resources(self.module_names)
         return self._rules
 
     def add_rule(self, resource_class, uri, endpoint,

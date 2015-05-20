@@ -50,35 +50,35 @@ class TestUtils(object):
     def test_load_resources(self):
         load_resources(['testapi.resources.users.resource'])
 
-    def test_load_resources_with_nonexistent_entrypoints(self):
+    def test_load_resources_with_nonexistent_module_names(self):
         with pytest.raises(ImportError):
             load_resources(['testapi.resources.counts.resource'])
 
-    def test_load_resources_with_wildcards_entrypoints(self):
+    def test_load_resources_with_wildcards_module_names(self):
         load_resources(['testapi.resources.*.resource'])
 
-    def test_load_resources_with_nonexistent_wildcards_entrypoints(self):
-        entrypoint = 'testapi.resources.users.*.resource'
+    def test_load_resources_with_nonexistent_wildcards_module_names(self):
+        module_name = 'testapi.resources.users.*.resource'
         with pytest.raises(ImportError) as exc:
-            load_resources([entrypoint])
-        expected_exc_msg = 'No module found with wildcards %r' % entrypoint
+            load_resources([module_name])
+        expected_exc_msg = 'No module found with wildcards %r' % module_name
         assert str(exc.value) == expected_exc_msg
 
     def test_expand_wildcards(self):
-        entrypoints = expand_wildcards('testapi.resources.*.resource')
-        assert entrypoints == ['testapi.resources.users.resource',
-                               'testapi.resources.orders.resource']
+        module_names = expand_wildcards('testapi.resources.*.resource')
+        assert module_names == ['testapi.resources.users.resource',
+                                'testapi.resources.orders.resource']
 
-        entrypoints = expand_wildcards('testapi.*.*.resource')
-        assert entrypoints == ['testapi.resources.users.resource',
-                               'testapi.resources.orders.resource']
+        module_names = expand_wildcards('testapi.*.*.resource')
+        assert module_names == ['testapi.resources.users.resource',
+                                'testapi.resources.orders.resource']
 
-    def test_expand_wildcards_with_nonexistent_entrypoint(self):
-        entrypoints = expand_wildcards('testapi.resources.users.*.resource')
-        assert not entrypoints
+    def test_expand_wildcards_with_nonexistent_module_name(self):
+        module_names = expand_wildcards('testapi.resources.users.*.resource')
+        assert not module_names
 
     def test_expand_wildcards_package(self):
-        entrypoints = expand_wildcards('testapi.resources.*')
-        assert entrypoints == ['testapi.resources',
-                               'testapi.resources.users',
-                               'testapi.resources.orders']
+        module_names = expand_wildcards('testapi.resources.*')
+        assert module_names == ['testapi.resources',
+                                'testapi.resources.users',
+                                'testapi.resources.orders']

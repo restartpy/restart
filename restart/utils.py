@@ -8,8 +8,8 @@ from threading import RLock
 from werkzeug.utils import import_string
 
 
-def load_resources(entrypoints):
-    """Import all modules in `entrypoints` to load resources.
+def load_resources(module_names):
+    """Import all modules in `module_names` to load resources.
 
     Example usage:
         load_resources(['yourapi.resources.users.resource'])
@@ -18,21 +18,21 @@ def load_resources(entrypoints):
         # the equivalent of the above two lines
         load_resources(['yourapi.resources.*.resource'])
     """
-    for entrypoint in entrypoints:
-        if '*' in entrypoint:
-            actual_entrypoints = expand_wildcards(entrypoint)
-            if not actual_entrypoints:
+    for module_name in module_names:
+        if '*' in module_name:
+            actual_module_names = expand_wildcards(module_name)
+            if not actual_module_names:
                 raise ImportError(
-                    'No module found with wildcards %r' % entrypoint
+                    'No module found with wildcards %r' % module_name
                 )
-            for actual_entrypoint in actual_entrypoints:
-                import_string(actual_entrypoint)
+            for actual_module_name in actual_module_names:
+                import_string(actual_module_name)
         else:
-            import_string(entrypoint)
+            import_string(module_name)
 
 
-def expand_wildcards(entrypoint):
-    """Expand the wildcards in `entrypoint` based on `sys.path`.
+def expand_wildcards(module_name):
+    """Expand the wildcards in `module_name` based on `sys.path`.
 
     Suppose the directory structure of "yourapi" is as below:
         yourapi
@@ -51,7 +51,7 @@ def expand_wildcards(entrypoint):
          'yourapi.resources.orders.resource']
     """
     for basedir in sys.path:
-        modpath = entrypoint.replace('.', '/')
+        modpath = module_name.replace('.', '/')
         filepath = os.path.join(basedir, modpath)
         modfile = filepath + '.py'
         pkgfile = os.path.join(filepath, '__init__.py')
