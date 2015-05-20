@@ -1,8 +1,12 @@
 from __future__ import absolute_import
 
-from restart import router, status
+from restart import status
+from restart.art import RESTArt
 from restart.resource import Resource
 from restart.exceptions import NotFoundError
+
+
+art = RESTArt()
 
 
 todos = {
@@ -11,7 +15,7 @@ todos = {
 }
 
 
-@router.register
+@art.register
 class Todo(Resource):
     name = 'todos'
 

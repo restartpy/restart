@@ -14,10 +14,12 @@ A Python library with good intentions for building REST APIs.
 
 # helloworld.py
 
-from restart import router
+from restart.art import RESTArt
 from restart.resource import Resource
 
-@router.route(methods=['GET'])
+art = RESTArt()
+
+@art.route(methods=['GET'])
 class Greeting(Resource):
     name = 'greeting'
 
@@ -26,10 +28,10 @@ class Greeting(Resource):
 
 ```
 
-Run the API via command `restart`:
+Run the `Greeting` resource as an API via command `restart`:
 
 ```
-$ restart helloworld
+$ restart helloworld:art
 ```
 
 Consume the API now:
