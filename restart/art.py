@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from .config import config
-from .utils import load_resources
+from .utils import load_resources, locked_cached_property
 
 
 class RESTArt(object):
@@ -10,7 +10,7 @@ class RESTArt(object):
         self.import_name = import_name
         self._rules = {}
 
-    @property
+    @locked_cached_property
     def rules(self):
         # Load resources located in `import_name` if not in interactive mode
         if self.import_name is not None and self.import_name != '__main__':
