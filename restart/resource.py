@@ -1,9 +1,21 @@
 from __future__ import absolute_import
 
-from .response import Response
+from werkzeug.utils import import_string
+
+from .config import config
+from .request import WerkzeugProxyRequest
+from .response import Response, WerkzeugProxyResponse
 
 
 class Resource(object):
+
+    name = None
+
+    proxy_request_class = WerkzeugProxyRequest
+    proxy_response_class = WerkzeugProxyResponse
+
+    parser_class = import_string(config.PARSER_CLASS)
+    renderer_class = import_string(config.RENDERER_CLASS)
 
     def dispatch_request(self, action_map, request, *args, **kwargs):
         def get_action_name(method):
@@ -27,8 +39,11 @@ class Resource(object):
 
         assert action is not None, 'Unimplemented action %r' % action_name
 
-        rv = action(request, *args, **kwargs)
-        return self.make_response(rv)
+        proxy_req = self.proxy_request_class(request, self.parser_class)
+        rv = action(proxy_req, *args, **kwargs)
+        response = self.make_response(rv)
+        proxy_resp = self.proxy_response_class(response, self.renderer_class)
+        return proxy_resp.make_response()
 
     def make_response(self, rv):
         status = None

@@ -9,3 +9,7 @@ ACTION_MAP = {
     'HEAD': 'head',
     'TRACE': 'trace',
 }
+
+# The default Parser class and Renderer class
+PARSER_CLASS = 'restart.parser.JSONParser'
+RENDERER_CLASS = 'restart.renderer.JSONRenderer'

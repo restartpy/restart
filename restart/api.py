@@ -1,9 +1,8 @@
 from __future__ import absolute_import
 
 from werkzeug.routing import Map, Rule
+from werkzeug.wrappers import Request
 from werkzeug.serving import run_simple
-
-from .request import Request
 
 
 class API(object):
