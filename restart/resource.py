@@ -3,23 +3,24 @@ from __future__ import absolute_import
 from werkzeug.utils import import_string
 
 from .config import config
-from .request import WerkzeugProxyRequest
-from .response import Response, WerkzeugProxyResponse
+from .response import Response
 
 
 class Resource(object):
 
     name = None
 
-    proxy_request_class = WerkzeugProxyRequest
-    proxy_response_class = WerkzeugProxyResponse
-
     parser_class = import_string(config.PARSER_CLASS)
     renderer_class = import_string(config.RENDERER_CLASS)
 
-    def dispatch_request(self, action_map, request, *args, **kwargs):
+    def __init__(self, proxy_request_class, proxy_response_class, action_map):
+        self.proxy_request_class = proxy_request_class
+        self.proxy_response_class = proxy_response_class
+        self.action_map = action_map
+
+    def dispatch_request(self, request, *args, **kwargs):
         try:
-            action_name = action_map[request.method]
+            action_name = self.action_map[request.method]
         except KeyError as exc:
             exc.message = (
                 'Config `ACTION_MAP` has no mapping for %r' % request.method

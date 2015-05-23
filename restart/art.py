@@ -1,14 +1,40 @@
 from __future__ import absolute_import
 
 from .config import config
+from .request import WerkzeugProxyRequest
+from .response import WerkzeugProxyResponse
 from .utils import load_resources, locked_cached_property
 
 
 class RESTArt(object):
 
+    proxy_request_class = WerkzeugProxyRequest
+    proxy_response_class = WerkzeugProxyResponse
+
     def __init__(self, module_names=None):
         self.module_names = module_names
         self._rules = {}
+
+    def _get_handler(self, resource_class, actions):
+        action_map = config.ACTION_MAP.copy()
+        if actions:
+            # Override `ACTION_MAP` by `actions`
+            action_map.update(actions)
+
+        def handler(request, *args, **kwargs):
+            resource = handler.resource_class(
+                handler.proxy_request_class,
+                handler.proxy_response_class,
+                handler.action_map
+            )
+            return resource.dispatch_request(request, *args, **kwargs)
+
+        # Attach related data to the handler
+        handler.resource_class = resource_class
+        handler.proxy_request_class = self.proxy_request_class
+        handler.proxy_response_class = self.proxy_response_class
+        handler.action_map = action_map
+        return handler
 
     @locked_cached_property
     def rules(self):
@@ -23,7 +49,9 @@ class RESTArt(object):
             raise AssertionError(
                 'Endpoint name `%s` already exists' % endpoint
             )
-        self._rules[endpoint] = Rule(uri, methods, resource_class, actions)
+        methods = methods or config.ACTION_MAP.keys()
+        handler = self._get_handler(resource_class, actions)
+        self._rules[endpoint] = Rule(uri, methods, handler)
 
     def route(self, cls=None, uri=None, endpoint=None,
               methods=None, actions=None):
@@ -59,24 +87,10 @@ class RESTArt(object):
 
 
 class Rule(object):
-    def __init__(self, uri, methods, resource_class, actions):
+    def __init__(self, uri, methods, handler):
         self.uri = uri
-        self.methods = methods or config.ACTION_MAP.keys()
-        self.handler = self._get_handler(resource_class, actions)
-
-    def _get_handler(self, resource_class, actions):
-        action_map = config.ACTION_MAP.copy()
-        if actions:
-            # Override `ACTION_MAP` by `actions`
-            action_map.update(actions)
-
-        def handler(request, *args, **kwargs):
-            resource = handler.resource_class()
-            return resource.dispatch_request(action_map, request,
-                                             *args, **kwargs)
-
-        handler.resource_class = resource_class
-        return handler
+        self.methods = methods
+        self.handler = handler
 
     def __str__(self):
         return '<Rule [uri({!r})]>'.format(self.uri)
