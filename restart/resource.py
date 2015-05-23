@@ -18,26 +18,19 @@ class Resource(object):
     renderer_class = import_string(config.RENDERER_CLASS)
 
     def dispatch_request(self, action_map, request, *args, **kwargs):
-        def get_action_name(method):
-            try:
-                action_name = action_map[method]
-            except KeyError as e:
-                e.message = (
-                    'Config `ACTION_MAP` has no mapping for %r' % method
-                )
-                raise
-            return action_name
+        try:
+            action_name = action_map[request.method]
+        except KeyError as exc:
+            exc.message = (
+                'Config `ACTION_MAP` has no mapping for %r' % request.method
+            )
+            raise
 
-        action_name = get_action_name(request.method)
-        action = getattr(self, action_name, None)
-
-        # If the request method is HEAD and there's no handler for it,
-        # retry with GET.
-        if action is None and request.method == 'HEAD':
-            action_name = get_action_name('GET')
-            action = getattr(self, action_name, None)
-
-        assert action is not None, 'Unimplemented action %r' % action_name
+        try:
+            action = getattr(self, action_name)
+        except AttributeError as exc:
+            exc.message = 'Unimplemented action %r' % action_name
+            raise
 
         proxy_req = self.proxy_request_class(request, self.parser_class)
         rv = action(proxy_req, *args, **kwargs)
