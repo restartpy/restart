@@ -22,15 +22,15 @@ class Resource(object):
         try:
             action_name = self.action_map[request.method]
         except KeyError as exc:
-            exc.message = (
-                'Config `ACTION_MAP` has no mapping for %r' % request.method
+            exc.args = (
+                'Config `ACTION_MAP` has no mapping for %r' % request.method,
             )
             raise
 
         try:
             action = getattr(self, action_name)
         except AttributeError as exc:
-            exc.message = 'Unimplemented action %r' % action_name
+            exc.args = ('Unimplemented action %r' % action_name,)
             raise
 
         proxy_req = self.proxy_request_class(request, self.parser_class)
@@ -40,7 +40,7 @@ class Resource(object):
         return proxy_resp.make_response()
 
     def make_response(self, rv):
-        status = None
+        status = 200
         headers = None
 
         if isinstance(rv, tuple):
