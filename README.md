@@ -44,9 +44,15 @@ $ curl http://127.0.0.1:5000/greeting
 ```
 
 
+## Documentation
+
+Checkout the [Documentation][1].
+
+
 ## License
 
-[MIT][1]
+[MIT][2]
 
 
-[1]: http://opensource.org/licenses/MIT
+[1]: https://restart.readthedocs.org
+[2]: http://opensource.org/licenses/MIT

@@ -25,15 +25,11 @@ A RESTArt resource is just a class:
         def read(self, request):
             return {'hello': 'world'}
 
-Run the `Greeting` resource as an API via command `restart`:
-
-.. code-block:: shell
+Run the `Greeting` resource as an API via command `restart`::
 
     $ restart helloworld:art
 
-Consume the API now:
-
-.. code-block:: shell
+Consume the API now::
 
     $ curl http://127.0.0.1:5000/greeting
     {"hello": "world"}

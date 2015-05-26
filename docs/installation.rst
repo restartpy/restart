@@ -7,7 +7,7 @@ Installation
 Release Version
 ---------------
 
-Install RESTArt with `pip`:
+Install RESTArt with `pip`::
 
     $ pip install Python-RESTArt
 
@@ -15,7 +15,7 @@ Install RESTArt with `pip`:
 Development Version
 -------------------
 
-Install development version from `GitHub`:
+Install development version from `GitHub`::
 
     $ git clone https://github.com/RussellLuo/restart.git
     $ cd restart
