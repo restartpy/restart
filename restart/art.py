@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from .config import config
 from .request import WerkzeugProxyRequest
 from .response import WerkzeugProxyResponse
-from .utils import load_resources, locked_cached_property
 
 
 class RESTArt(object):
@@ -11,8 +10,7 @@ class RESTArt(object):
     proxy_request_class = WerkzeugProxyRequest
     proxy_response_class = WerkzeugProxyResponse
 
-    def __init__(self, module_names=None):
-        self.module_names = module_names
+    def __init__(self):
         self._rules = {}
 
     def _get_handler(self, resource_class, actions):
@@ -36,11 +34,8 @@ class RESTArt(object):
         handler.action_map = action_map
         return handler
 
-    @locked_cached_property
+    @property
     def rules(self):
-        # Load resources located in `module_names` if specified
-        if self.module_names is not None:
-            load_resources(self.module_names)
         return self._rules
 
     def add_rule(self, resource_class, uri, endpoint,
