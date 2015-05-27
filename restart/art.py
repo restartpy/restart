@@ -6,6 +6,8 @@ from .response import WerkzeugProxyResponse
 
 
 class RESTArt(object):
+    """The RESTArt object that represents the RESTArt API and acts
+    as the central object."""
 
     proxy_request_class = WerkzeugProxyRequest
     proxy_response_class = WerkzeugProxyResponse

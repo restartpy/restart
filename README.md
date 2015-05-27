@@ -46,7 +46,7 @@ $ curl http://127.0.0.1:5000/greeting
 
 ## Documentation
 
-Checkout the [Documentation][1].
+Check out the [documentation][1].
 
 
 ## License
