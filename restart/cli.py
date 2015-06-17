@@ -5,8 +5,8 @@ import sys
 import click
 from werkzeug.utils import import_string
 
-from .art import RESTArt
-from .api import API
+from .api import RESTArt
+from .serving import Service
 
 
 @click.command()
@@ -18,11 +18,11 @@ def main(entrypoint, host, port, debug):
     if '.' not in sys.path:
         sys.path.insert(0, '.')
 
-    art = import_string(entrypoint)
-    if not isinstance(art, RESTArt):
+    api = import_string(entrypoint)
+    if not isinstance(api, RESTArt):
         raise RuntimeError(
             'No instance of `RESTArt` found with entrypoint %r' % entrypoint
         )
 
-    api = API(art)
-    api.run(host, port, debug)
+    service = Service(api)
+    service.run(host, port, debug)

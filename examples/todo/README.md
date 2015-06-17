@@ -9,7 +9,7 @@ A Todo API as a basic example.
 
 ```
 $ cd examples/todo
-$ restart todo:art
+$ restart todo:api
  * Running on http://127.0.0.1:5000/
 ```
 

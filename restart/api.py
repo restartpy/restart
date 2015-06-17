@@ -1,36 +1,95 @@
 from __future__ import absolute_import
 
-from werkzeug.routing import Map, Rule
-from werkzeug.wrappers import Request
-from werkzeug.serving import run_simple
+from .config import config
+from .request import WerkzeugProxyRequest
+from .response import WerkzeugProxyResponse
 
 
-class API(object):
-    def __init__(self, art):
-        self.raw_rules = art.rules
-        self.rule_map = Map([
-            Rule(rule.uri, endpoint=endpoint, methods=rule.methods)
-            for endpoint, rule in self.raw_rules.iteritems()
-        ])
+class RESTArt(object):
+    """The RESTArt object that represents the RESTArt API and acts
+    as the central object."""
 
-    def wsgi_app(self, environ, start_response):
-        request = Request(environ)
-        adapter = self.rule_map.bind_to_environ(request.environ)
-        endpoint, kwargs = adapter.match()
-        response = self.raw_rules[endpoint].handler(request, **kwargs)
-        return response(environ, start_response)
+    proxy_request_class = WerkzeugProxyRequest
+    proxy_response_class = WerkzeugProxyResponse
 
-    def __call__(self, environ, start_response):
-        return self.wsgi_app(environ, start_response)
+    def __init__(self):
+        self._rules = {}
 
-    def run(self, host=None, port=None, debug=None, **options):
-        """Runs the API on a local development server."""
-        if host is None:
-            host = '127.0.0.1'
-        if port is None:
-            port = 5000
-        if debug is not None:
-            debug = bool(debug)
-        options.setdefault('use_reloader', debug)
-        options.setdefault('use_debugger', debug)
-        run_simple(host, port, self, **options)
+    def _get_handler(self, resource_class, actions):
+        action_map = config.ACTION_MAP.copy()
+        if actions:
+            # Override `ACTION_MAP` by `actions`
+            action_map.update(actions)
+
+        def handler(request, *args, **kwargs):
+            resource = handler.resource_class(
+                handler.proxy_request_class,
+                handler.proxy_response_class,
+                handler.action_map
+            )
+            return resource.dispatch_request(request, *args, **kwargs)
+
+        # Attach related data to the handler
+        handler.resource_class = resource_class
+        handler.proxy_request_class = self.proxy_request_class
+        handler.proxy_response_class = self.proxy_response_class
+        handler.action_map = action_map
+        return handler
+
+    @property
+    def rules(self):
+        return self._rules
+
+    def add_rule(self, resource_class, uri, endpoint,
+                 methods=None, actions=None):
+        if endpoint in self._rules:
+            raise AssertionError(
+                'Endpoint name `%s` already exists' % endpoint
+            )
+        methods = methods or config.ACTION_MAP.keys()
+        handler = self._get_handler(resource_class, actions)
+        self._rules[endpoint] = Rule(uri, methods, handler)
+
+    def route(self, cls=None, uri=None, endpoint=None,
+              methods=None, actions=None):
+        def decorator(cls):
+            actual_uri = uri or '/%s' % cls.name
+            actual_endpoint = endpoint or cls.name
+            self.add_rule(cls, actual_uri, actual_endpoint, methods, actions)
+            return cls
+        if cls:
+            return decorator(cls)
+        return decorator
+
+    def register(self, cls=None, prefix=None, pk='<pk>',
+                 list_actions=None, item_actions=None):
+        def decorator(cls):
+            actual_prefix = prefix or '/%s' % cls.name
+            actual_list_actions = {'GET': 'index'}
+            if list_actions:
+                actual_list_actions.update(list_actions)
+
+            self.add_rule(cls, actual_prefix,
+                          endpoint='%s_list' % cls.name,
+                          methods=['GET', 'POST'],
+                          actions=actual_list_actions)
+            self.add_rule(cls, '%s/%s' % (actual_prefix, pk),
+                          endpoint='%s_item' % cls.name,
+                          methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                          actions=item_actions)
+            return cls
+        if cls:
+            return decorator(cls)
+        return decorator
+
+
+class Rule(object):
+    def __init__(self, uri, methods, handler):
+        self.uri = uri
+        self.methods = methods
+        self.handler = handler
+
+    def __str__(self):
+        return '<Rule [uri({!r})]>'.format(self.uri)
+
+    __repr__ = __str__

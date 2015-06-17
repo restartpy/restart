@@ -13,12 +13,12 @@ A Minimal API
 
 A minimal RESTArt API looks something like this::
 
-    from restart.art import RESTArt
+    from restart.api import RESTArt
     from restart.resource import Resource
 
-    art = RESTArt()
+    api = RESTArt()
 
-    @art.route(methods=['GET'])
+    @api.route(methods=['GET'])
     class Greeting(Resource):
         name = 'greeting'
 
@@ -27,7 +27,7 @@ A minimal RESTArt API looks something like this::
 
 Just save it as :file:`helloworld.py` and run it with :command:`restart` command::
 
-    $ restart helloworld:art
+    $ restart helloworld:api
 
 Then you can consume the API now::
 
@@ -36,9 +36,9 @@ Then you can consume the API now::
 
 So what does the above code do?
 
-1. First we import two classes :class:`~restart.art.RESTArt` and :class:`~restart.resource.Resource` for later use.
-2. Next we create an instance of the :class:`~restart.art.RESTArt` class, which represents the whole RESTArt API.
-3. We then use the :meth:`~restart.art.RESTArt.route` decorator to register the `Greeting` class which only cares HTTP verb `GET`.
+1. First we import two classes :class:`~restart.api.RESTArt` and :class:`~restart.resource.Resource` for later use.
+2. Next we create an instance of the :class:`~restart.api.RESTArt` class, which represents the whole RESTArt API.
+3. We then use the :meth:`~restart.api.RESTArt.route` decorator to register the `Greeting` class which only cares HTTP verb `GET`.
 4. The `Greeting` class is defined as a resource by subclassing the :class:`~restart.resource.Resource` class. It has a :meth:`read` method which is a handler for HTTP verb `GET`.
 
 
@@ -92,17 +92,17 @@ Note the lack of a greeting ID and usage of POST verb.
 Routing
 -------
 
-With the above concepts and conventions in mind, RESTArt provide three methods to route a resource: :meth:`~restart.art.RESTArt.register`, :meth:`~restart.art.RESTArt.route` and :meth:`~restart.art.RESTArt.add_rule`.
+With the above concepts and conventions in mind, RESTArt provide three methods to route a resource: :meth:`~restart.api.RESTArt.register`, :meth:`~restart.api.RESTArt.route` and :meth:`~restart.api.RESTArt.add_rule`.
 
 
 register()
 ^^^^^^^^^^
 
-The :meth:`~restart.art.RESTArt.register` decorator is provided as a convenient helper specially for plural resources.
+The :meth:`~restart.api.RESTArt.register` decorator is provided as a convenient helper specially for plural resources.
 
-Take the `Todo` resource as an example, we may define and register it with the :meth:`~restart.art.RESTArt.register` decorator like this::
+Take the `Todo` resource as an example, we may define and register it with the :meth:`~restart.api.RESTArt.register` decorator like this::
 
-    @art.register
+    @api.register
     class Todo(Resource):
         name = 'todos'
 
@@ -123,13 +123,13 @@ PATCH       /todos/<pk>  Todo:update()    update a specific todo
 DELETE      /todos/<pk>  Todo:delete()    delete a specific todo
 ==========  ===========  ===============  ===========================
 
-.. note:: You can also register a plural resource by using :meth:`~restart.art.RESTArt.route` instead of :meth:`~restart.art.RESTArt.register`, although it is more complicated.
+.. note:: You can also register a plural resource by using :meth:`~restart.api.RESTArt.route` instead of :meth:`~restart.api.RESTArt.register`, although it is more complicated.
 
    For example, the following registration is equivalent to the above one::
 
-    @art.route(uri='/todos', endpoint='todos_list',
+    @api.route(uri='/todos', endpoint='todos_list',
                methods=['GET', 'POST'], actions={'GET': 'index'})
-    @art.route(uri='/todos/<pk>', endpoint='todos_item',
+    @api.route(uri='/todos/<pk>', endpoint='todos_item',
                methods=['GET', 'PUT', 'PATCH', 'DELETE'])
     class Todo(Resource):
         name = 'todos'
@@ -140,11 +140,11 @@ DELETE      /todos/<pk>  Todo:delete()    delete a specific todo
 route()
 ^^^^^^^
 
-The :meth:`~restart.art.RESTArt.route` decorator is provided mainly for singular resources, but you can also use it for plural resources to customize more details.
+The :meth:`~restart.api.RESTArt.route` decorator is provided mainly for singular resources, but you can also use it for plural resources to customize more details.
 
 For example, if we want to provide a global and single configuration object, we can create it as a singular resource like this::
 
-    @art.route(methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+    @api.route(methods=['GET', 'PUT', 'PATCH', 'DELETE'])
     class Configuration(Resource):
         name = 'configuration'
 
@@ -165,4 +165,4 @@ DELETE      /configuration  Configuration:delete()   delete the configuration
 add_rule()
 ^^^^^^^^^^
 
-The :meth:`~restart.art.RESTArt.add_rule` method is the fundamental method both for :meth:`~restart.art.RESTArt.register` and :meth:`~restart.art.RESTArt.route`. If you do not like the decorator style, and you want to customize more behaviors, you should use it.
+The :meth:`~restart.api.RESTArt.add_rule` method is the fundamental method both for :meth:`~restart.api.RESTArt.register` and :meth:`~restart.api.RESTArt.route`. If you do not like the decorator style, and you want to customize more behaviors, you should use it.

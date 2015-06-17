@@ -16,12 +16,12 @@ A `RESTArt` resource is just a class:
 
 # helloworld.py
 
-from restart.art import RESTArt
+from restart.api import RESTArt
 from restart.resource import Resource
 
-art = RESTArt()
+api = RESTArt()
 
-@art.route(methods=['GET'])
+@api.route(methods=['GET'])
 class Greeting(Resource):
     name = 'greeting'
 
@@ -33,7 +33,7 @@ class Greeting(Resource):
 Run the `Greeting` resource as an API via command `restart`:
 
 ```
-$ restart helloworld:art
+$ restart helloworld:api
 ```
 
 Consume the API now:

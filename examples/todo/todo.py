@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 
 from restart import status
-from restart.art import RESTArt
+from restart.api import RESTArt
 from restart.resource import Resource
 from restart.exceptions import NotFoundError
 
 
-art = RESTArt()
+api = RESTArt()
 
 
 todos = {
@@ -15,7 +15,7 @@ todos = {
 }
 
 
-@art.register
+@api.register
 class Todo(Resource):
     name = 'todos'
 
