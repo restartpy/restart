@@ -3,10 +3,11 @@ from __future__ import absolute_import
 from .utils import locked_cached_property
 
 
-class ProxyRequest(object):
+class Request(object):
+    """The base request class."""
 
-    def __init__(self, raw_request, parser_class):
-        self.raw_request = raw_request
+    def __init__(self, initial_request, parser_class):
+        self.initial_request = initial_request
         self.parser = parser_class()
 
     @locked_cached_property
@@ -33,13 +34,14 @@ class ProxyRequest(object):
         raise NotImplementedError()
 
 
-class WerkzeugProxyRequest(ProxyRequest):
+class WerkzeugRequest(Request):
+    """The Werkzeug-specific request class."""
 
     def get_data(self):
-        return self.raw_request.data
+        return self.initial_request.data
 
     def get_method(self):
-        return self.raw_request.method
+        return self.initial_request.method
 
     def get_uri(self):
-        return self.raw_request.url
+        return self.initial_request.url

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import pytest
 
-from restart.request import ProxyRequest, WerkzeugProxyRequest
+from restart.request import Request, WerkzeugRequest
 from restart.parser import JSONParser
 
 
@@ -15,21 +15,21 @@ class FakeWerkzeugRequest(object):
 
 class TestRequest(object):
 
-    def test_proxy_request(self):
-        raw_request = FakeWerkzeugRequest('{"hello": "world"}')
-        proxy_request = ProxyRequest(raw_request, JSONParser)
+    def test_request(self):
+        initial_request = FakeWerkzeugRequest('{"hello": "world"}')
+        request = Request(initial_request, JSONParser)
 
         with pytest.raises(NotImplementedError):
-            proxy_request.data
+            request.data
         with pytest.raises(NotImplementedError):
-            proxy_request.method
+            request.method
         with pytest.raises(NotImplementedError):
-            proxy_request.uri
+            request.uri
 
-    def test_werkzeug_proxy_request(self):
-        raw_request = FakeWerkzeugRequest('{"hello": "world"}')
-        proxy_request = WerkzeugProxyRequest(raw_request, JSONParser)
+    def test_werkzeug_request(self):
+        initial_request = FakeWerkzeugRequest('{"hello": "world"}')
+        werkzeug_request = WerkzeugRequest(initial_request, JSONParser)
 
-        assert proxy_request.data == {'hello': 'world'}
-        assert proxy_request.method == 'GET'
-        assert proxy_request.uri == '/'
+        assert werkzeug_request.data == {'hello': 'world'}
+        assert werkzeug_request.method == 'GET'
+        assert werkzeug_request.uri == '/'

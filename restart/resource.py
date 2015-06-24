@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from werkzeug.utils import import_string
 
 from .config import config
-from .response import Response
 
 
 class Resource(object):
@@ -13,9 +12,9 @@ class Resource(object):
     parser_class = import_string(config.PARSER_CLASS)
     renderer_class = import_string(config.RENDERER_CLASS)
 
-    def __init__(self, proxy_request_class, proxy_response_class, action_map):
-        self.proxy_request_class = proxy_request_class
-        self.proxy_response_class = proxy_response_class
+    def __init__(self, request_class, response_class, action_map):
+        self.request_class = request_class
+        self.response_class = response_class
         self.action_map = action_map
 
     def dispatch_request(self, request, *args, **kwargs):
@@ -33,11 +32,10 @@ class Resource(object):
             exc.args = ('Unimplemented action %r' % action_name,)
             raise
 
-        proxy_req = self.proxy_request_class(request, self.parser_class)
-        rv = action(proxy_req, *args, **kwargs)
+        request = self.request_class(request, self.parser_class)
+        rv = action(request, *args, **kwargs)
         response = self.make_response(rv)
-        proxy_resp = self.proxy_response_class(response, self.renderer_class)
-        return proxy_resp.make_response()
+        return response.finalize(self.renderer_class)
 
     def make_response(self, rv):
         status = 200
@@ -54,7 +52,7 @@ class Resource(object):
 
         if rv is None:
             raise ValueError('Resource action did not return a response')
-        elif not isinstance(rv, Response):
-            rv = Response(rv, status=status, headers=headers)
+        elif not isinstance(rv, self.response_class):
+            rv = self.response_class(rv, status=status, headers=headers)
 
         return rv
