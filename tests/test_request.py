@@ -7,8 +7,8 @@ from restart.parser import JSONParser
 
 
 class FakeWerkzeugRequest(object):
-    def __init__(self, data=None, method='GET', url='/'):
-        self.data = data or {}
+    def __init__(self, data, method='GET', url='/'):
+        self.data = data
         self.method = method
         self.url = url
 
@@ -31,5 +31,13 @@ class TestRequest(object):
         werkzeug_request = WerkzeugRequest(initial_request, JSONParser)
 
         assert werkzeug_request.data == {'hello': 'world'}
+        assert werkzeug_request.method == 'GET'
+        assert werkzeug_request.uri == '/'
+
+    def test_werkzeug_request_with_empty_data(self):
+        initial_request = FakeWerkzeugRequest('')
+        werkzeug_request = WerkzeugRequest(initial_request, JSONParser)
+
+        assert werkzeug_request.data == {}
         assert werkzeug_request.method == 'GET'
         assert werkzeug_request.uri == '/'

@@ -13,6 +13,8 @@ class Request(object):
     @locked_cached_property
     def data(self):
         raw = self.get_data()
+        if not raw:
+            return {}
         parsed = self.parser.parse(raw)
         return parsed
 
