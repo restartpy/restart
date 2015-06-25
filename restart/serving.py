@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 
 from werkzeug.routing import Map, Rule
-from werkzeug.wrappers import Request
+from werkzeug.wrappers import Request, Response
 from werkzeug.serving import run_simple
+from werkzeug.exceptions import NotFound
 
 
 class Service(object):
@@ -16,8 +17,12 @@ class Service(object):
     def wsgi_app(self, environ, start_response):
         request = Request(environ)
         adapter = self.rule_map.bind_to_environ(request.environ)
-        endpoint, kwargs = adapter.match()
-        response = self.raw_rules[endpoint].handler(request, **kwargs)
+        try:
+            endpoint, kwargs = adapter.match()
+        except NotFound:
+            response = Response('The requested URI was not found.', 404)
+        else:
+            response = self.raw_rules[endpoint].handler(request, **kwargs)
         return response(environ, start_response)
 
     def __call__(self, environ, start_response):

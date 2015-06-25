@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from restart import status
 from restart.api import RESTArt
 from restart.resource import Resource
-from restart.exceptions import NotFoundError
+from restart.exceptions import NotFound
 
 
 api = RESTArt()
@@ -33,7 +33,7 @@ class Todo(Resource):
         try:
             return todos[pk]
         except KeyError:
-            raise NotFoundError()
+            raise NotFound()
 
     def replace(self, request, pk):
         pk = int(pk)
@@ -47,7 +47,7 @@ class Todo(Resource):
             todos[pk].update(request.data)
             return '', status.HTTP_204_NO_CONTENT
         except KeyError:
-            raise NotFoundError()
+            raise NotFound()
 
     def delete(self, request, pk):
         pk = int(pk)
@@ -55,4 +55,4 @@ class Todo(Resource):
             del todos[pk]
             return '', status.HTTP_204_NO_CONTENT
         except KeyError:
-            raise NotFoundError()
+            raise NotFound()

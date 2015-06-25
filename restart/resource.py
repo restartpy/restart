@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from werkzeug.utils import import_string
 
 from .config import config
+from .exceptions import HTTPException
 
 
 class Resource(object):
@@ -33,9 +34,23 @@ class Resource(object):
             raise
 
         request = self.request_class(request, self.parser_class)
-        rv = action(request, *args, **kwargs)
+        try:
+            rv = action(request, *args, **kwargs)
+        except Exception as exc:
+            rv = self.handle_exception(request, exc)
         response = self.make_response(rv)
         return response.finalize(self.renderer_class)
+
+    def handle_exception(self, request, exc):
+        """Handle any exception that occurs, by returning an
+        appropriate response, or re-raising the error.
+        """
+        if isinstance(exc, HTTPException):
+            headers = dict(exc.get_headers(request.environ))
+            rv = ({'message': exc.description}, exc.code, headers)
+            return rv
+        else:
+            raise exc
 
     def make_response(self, rv):
         status = 200
