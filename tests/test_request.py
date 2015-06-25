@@ -55,6 +55,8 @@ class TestRequest(object):
         with pytest.raises(NotImplementedError):
             request.uri
         with pytest.raises(NotImplementedError):
+            request.path
+        with pytest.raises(NotImplementedError):
             request.args
         with pytest.raises(NotImplementedError):
             request.auth
@@ -74,6 +76,7 @@ class TestRequest(object):
         assert werkzeug_request.data == {'hello': 'world'}
         assert werkzeug_request.method == 'POST'
         assert werkzeug_request.uri == 'http://localhost/sample?x=1&y=2'
+        assert werkzeug_request.path == '/sample'
         assert werkzeug_request.args == {'x': '1', 'y': '2'}
         assert werkzeug_request.auth is None
         assert werkzeug_request.scheme == 'http'
@@ -86,6 +89,7 @@ class TestRequest(object):
         assert werkzeug_request.data == {}
         assert werkzeug_request.method == 'GET'
         assert werkzeug_request.uri == 'http://localhost/'
+        assert werkzeug_request.path == '/'
         assert werkzeug_request.args == {}
         assert werkzeug_request.auth is None
         assert werkzeug_request.scheme == 'http'

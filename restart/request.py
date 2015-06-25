@@ -27,6 +27,10 @@ class Request(object):
         return self.get_uri()
 
     @locked_cached_property
+    def path(self):
+        return self.get_path()
+
+    @locked_cached_property
     def args(self):
         return self.get_args()
 
@@ -49,6 +53,9 @@ class Request(object):
         raise NotImplementedError()
 
     def get_uri(self):
+        raise NotImplementedError()
+
+    def get_path(self):
         raise NotImplementedError()
 
     def get_args(self):
@@ -75,6 +82,9 @@ class WerkzeugRequest(Request):
 
     def get_uri(self):
         return self.initial_request.url
+
+    def get_path(self):
+        return self.initial_request.path
 
     def get_args(self):
         args = {
