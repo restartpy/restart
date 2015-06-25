@@ -26,6 +26,22 @@ class Request(object):
     def uri(self):
         return self.get_uri()
 
+    @locked_cached_property
+    def args(self):
+        return self.get_args()
+
+    @locked_cached_property
+    def auth(self):
+        return self.get_auth()
+
+    @locked_cached_property
+    def scheme(self):
+        return self.get_scheme()
+
+    @locked_cached_property
+    def environ(self):
+        return self.get_environ()
+
     def get_data(self):
         raise NotImplementedError()
 
@@ -33,6 +49,18 @@ class Request(object):
         raise NotImplementedError()
 
     def get_uri(self):
+        raise NotImplementedError()
+
+    def get_args(self):
+        raise NotImplementedError()
+
+    def get_auth(self):
+        raise NotImplementedError()
+
+    def get_scheme(self):
+        raise NotImplementedError()
+
+    def get_environ(self):
         raise NotImplementedError()
 
 
@@ -47,3 +75,19 @@ class WerkzeugRequest(Request):
 
     def get_uri(self):
         return self.initial_request.url
+
+    def get_args(self):
+        args = {
+            k: v if len(v) > 1 else v[0]
+            for k, v in self.initial_request.args.iterlists()
+        }
+        return args
+
+    def get_auth(self):
+        return self.initial_request.authorization
+
+    def get_scheme(self):
+        return self.initial_request.scheme
+
+    def get_environ(self):
+        return self.initial_request.environ
