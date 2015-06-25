@@ -23,3 +23,4 @@ class TestRequest(object):
         assert final_response.data == '{"hello": "world"}'
         assert final_response.status_code == 200
         assert final_response.status == '200 OK'
+        assert final_response.headers['Content-Type'] == 'application/json'

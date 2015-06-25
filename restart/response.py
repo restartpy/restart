@@ -15,6 +15,7 @@ class Response(object):
         """Make the rendered final response."""
         renderer = renderer_class()
         self.data = renderer.render(self.data)
+        self.headers.update({'Content-Type': renderer.content_type})
         return self.get_specific_response()
 
     def get_specific_response(self):
