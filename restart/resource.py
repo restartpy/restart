@@ -18,6 +18,26 @@ class Resource(object):
         self.response_class = response_class
         self.action_map = action_map
 
+    @property
+    def logger(self):
+        from .logging import global_logger
+        return global_logger
+
+    def _get_head(self):
+        """Get the head message for logging."""
+        query_string = self.request.environ['QUERY_STRING']
+        separator = '?' if query_string else ''
+        head = '[%s %s%s%s]' % (self.request.method, self.request.path,
+                                separator, query_string)
+        return head
+
+    def log_message(self, msg):
+        if self.request.method in config.LOGGER_METHODS:
+            self.logger.debug('%s %s' % (self._get_head(), msg))
+
+    def log_exception(self, exc):
+        self.logger.exception('Exception on %s' % self._get_head())
+
     def dispatch_request(self, request, *args, **kwargs):
         try:
             action_name = self.action_map[request.method]
@@ -34,11 +54,17 @@ class Resource(object):
             raise
 
         request = self.request_class(request, self.parser_class)
+        self.request = request
+        self.log_message('<Request> %s' % request.data)
+
         try:
             rv = action(request, *args, **kwargs)
         except Exception as exc:
             rv = self.handle_exception(request, exc)
+
         response = self.make_response(rv)
+        self.log_message('<Response> %s %s' % (response.status, response.data))
+
         return response.finalize(self.renderer_class)
 
     def handle_exception(self, request, exc):
@@ -50,6 +76,7 @@ class Resource(object):
             rv = ({'message': exc.description}, exc.code, headers)
             return rv
         else:
+            self.log_exception(exc)
             raise exc
 
     def make_response(self, rv):

@@ -14,15 +14,22 @@ from .serving import Service
 @click.option('--host', '-h', default='127.0.0.1')
 @click.option('--port', '-p', default=5000)
 @click.option('--debug', '-d', default=False)
-def main(entrypoint, host, port, debug):
+@click.option('--level', '-l', default='INFO')
+def main(entrypoint, host, port, debug, level):
     if '.' not in sys.path:
         sys.path.insert(0, '.')
 
+    # Get the API object
     api = import_string(entrypoint)
     if not isinstance(api, RESTArt):
         raise RuntimeError(
             'No instance of `RESTArt` found with entrypoint %r' % entrypoint
         )
 
+    # Change the level of the global logger
+    from .logging import global_logger
+    global_logger.setLevel(level)
+
+    # Run the API as a service
     service = Service(api)
     service.run(host, port, debug)
