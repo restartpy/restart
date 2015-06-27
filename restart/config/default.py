@@ -1,4 +1,7 @@
-# The mapping of request methods to resource actions.
+# ** Action mapping **
+
+#: The mapping from request methods to resource actions, which is used
+#: to find the specified action to handle the request.
 ACTION_MAP = {
     'POST': 'create',
     'GET': 'read',
@@ -11,14 +14,28 @@ ACTION_MAP = {
 }
 
 
-# The default Parser class and Renderer class
+# ** Parser and Renderer **
+
+#: The default Parser class.
 PARSER_CLASS = 'restart.parser.JSONParser'
+
+#: The default Renderer class.
 RENDERER_CLASS = 'restart.renderer.JSONRenderer'
 
 
-# The settings for the global logger
+# ** Logger **
+
+#: Enable or disable the global logger.
 LOGGER_ENABLED = True
+
+#: A sequence of HTTP methods whose messages should be logged
 LOGGER_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+
+#: The logging level.
 LOGGER_LEVEL = 'INFO'
+
+#: The logging format for strings.
 LOGGER_FORMAT = '%(asctime)s.%(msecs)03d %(name)-10s %(levelname)-8s %(message)s'
+
+#: The logging format for date/time.
 LOGGER_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'

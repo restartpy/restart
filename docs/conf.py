@@ -284,3 +284,52 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+
+# -- Customized directives (by RussellLuo) ----------
+from sphinx.ext import autodoc
+
+
+class DataDocstringDocumenter(autodoc.DataDocumenter):
+    """A customized directive used to only display the docstring
+    of module data.
+
+    Inspired by http://stackoverflow.com/questions/7825263/including-docstring-in-sphinx-documentation
+    """
+    # The directive name is `autodata_docstring`
+    objtype = 'data_docstring'
+
+    # Do not indent the content
+    content_indent = u''
+
+    def add_directive_header(self, sig):
+        """Do not add the directive header to the generated content."""
+        pass
+
+
+class DataValueDocumenter(autodoc.DataDocumenter):
+    """A customized directive used to only display the value
+    of module data.
+    """
+    # The directive name is `autodata_value`
+    objtype = 'data_value'
+
+    # Do not indent the content
+    content_indent = u''
+
+    def add_directive_header(self, sig):
+        """Do not add the directive header to the generated content."""
+        # Reset analyzer to enforce `self.get_doc()` to be called.
+        self.analyzer = None
+
+    def get_doc(self, encoding=None, ignore=1):
+        """Override to treat the data value as the docstring. """
+        from sphinx.util.docstrings import prepare_docstring
+        from sphinx.util.inspect import object_description
+        docstring = object_description(self.object)
+        return [prepare_docstring(docstring, ignore)]
+
+
+def setup(app):
+    app.add_autodocumenter(DataDocstringDocumenter)
+    app.add_autodocumenter(DataValueDocumenter)

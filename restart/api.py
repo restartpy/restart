@@ -55,14 +55,17 @@ class RESTArt(object):
         """Register a resource for a given URI rule.
 
         :param resource_class: the resource class.
-        :param uri: the URI registered.
+        :param uri: the URI registered. Werkzeug-style converters are
+                    supported here. See `Rule Format <http://werkzeug
+                    .pocoo.org/docs/0.10/routing/#rule-format>`_ for
+                    more information.
         :param endpoint: the endpoint for the URI.
         :param methods: a sequence of allowed HTTP methods. If not
                         specified, all methods are allowed.
         :param actions: a dictionary with the specific action mapping pairs
                         used to update the default `ACTION_MAP`. If not
-                        specified, use the default `ACTION_MAP`. See
-                        :ref:`` for more information.
+                        specified, the default `ACTION_MAP` will be used.
+                        See :ref:`configuration` for more information.
         """
         if endpoint in self._rules:
             raise AssertionError(
@@ -78,14 +81,21 @@ class RESTArt(object):
         URI rule. See :ref:`routing` for more information.
 
         :param cls: the class that will be decorated.
-        :param uri: the URI registered.
-        :param endpoint: the endpoint for the URI.
+        :param uri: the URI registered. Werkzeug-style converters are
+                    supported here. See `Rule Format`_ for more
+                    information. If not specified, the resource
+                    :attr:`~restart.resource.Resource.name` with a leading
+                    slash will be used. For example, the `uri` will be
+                    `'/todos'` if the resource name is `'todos'`.
+        :param endpoint: the endpoint for the URI. If not specified, the
+                         resource :attr:`~restart.resource.Resource.name`
+                         will be used.
         :param methods: a sequence of allowed HTTP methods. If not
                         specified, all methods are allowed.
         :param actions: a dictionary with the specific action mapping pairs
                         used to update the default `ACTION_MAP`. If not
-                        specified, use the default `ACTION_MAP`. See
-                        :ref:`` for more information.
+                        specified, the default `ACTION_MAP` will be used.
+                        See :ref:`configuration` for more information.
         """
         def decorator(cls):
             actual_uri = uri or '/%s' % cls.name
@@ -103,14 +113,25 @@ class RESTArt(object):
 
         :param cls: the class that will be decorated.
         :param prefix: the URI prefix for the resource. If not specified,
-                       the resource name will be used.
-        :param pk: the primary key name to identify a specific resource.
-        :param list_actions: the action mapping for the list-part URI
-                             (without the primary key). See
-                             :ref:`plural-resources` for more information.
-        :param item_actions: the action mapping for the item-part URI
-                             (with the primary key). See
-                             :ref:`plural-resources` for more information.
+                       the resource :attr:`~restart.resource.Resource.name`
+                       with a leading slash will be used. For example, the
+                       `prefix` will be `'/todos'` if the resource name
+                       is `'todos'`.
+        :param pk: the primary key name used to identify a specific
+                   resource. Werkzeug-style converters are supported here.
+                   See `Rule Format`_ for more information.
+        :param list_actions: the action mapping pairs for the list-part
+                             URI (the URI without the primary key, see
+                             :ref:`plural-resources` for more information).
+                             If not specified, the default `ACTION_MAP`
+                             will be used. See :ref:`configuration` for
+                             more information.
+        :param item_actions: the action mapping pairs for the item-part
+                             URI (the URI with the primary key, see
+                             :ref:`plural-resources` for more information).
+                             If not specified, the default `ACTION_MAP`
+                             will be used. See :ref:`configuration` for
+                             more information.
         """
         def decorator(cls):
             actual_prefix = prefix or '/%s' % cls.name

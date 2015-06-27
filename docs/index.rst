@@ -14,6 +14,7 @@ This section covers most things you need to know to build REST APIs with RESTArt
 
    installation
    quickstart
+   configuration
 
 
 API Reference
