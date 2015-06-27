@@ -18,33 +18,37 @@ Action mapping
 ===========  ==============================  ==================================
 Option name  Default value                   Description
 ===========  ==============================  ==================================
-ACTION_MAP   .. autodata_value:: ACTION_MAP  .. autodata_docstring:: ACTION_MAP
+ACTION_MAP   .. autodata_value:: ACTION_MAP  The mapping from request methods
+                                             to resource actions, which is used
+                                             to find the specified action to
+                                             handle the request.
 ===========  ==============================  ==================================
 
 
 Parser and Renderer
 ^^^^^^^^^^^^^^^^^^^
 
-==============  ==================================  ======================================
+==============  ==================================  ===========================
 Option name     Default value                       Description
-==============  ==================================  ======================================
-PARSER_CLASS    .. autodata_value:: PARSER_CLASS    .. autodata_docstring:: PARSER_CLASS
-RENDERER_CLASS  .. autodata_value:: RENDERER_CLASS  .. autodata_docstring:: RENDERER_CLASS
-==============  ==================================  ======================================
+==============  ==================================  ===========================
+PARSER_CLASS    .. autodata_value:: PARSER_CLASS    The default Parser class.
+RENDERER_CLASS  .. autodata_value:: RENDERER_CLASS  The default Renderer class.
+==============  ==================================  ===========================
 
 
 Logger
 ^^^^^^^^^^^^^^^^^^^
 
-==================  ======================================  ==========================================
+==================  ======================================  ====================================
 Option name         Default value                           Description
-==================  ======================================  ==========================================
-LOGGER_ENABLED      .. autodata_value:: LOGGER_ENABLED      .. autodata_docstring:: LOGGER_ENABLED
-LOGGER_METHODS      .. autodata_value:: LOGGER_METHODS      .. autodata_docstring:: LOGGER_METHODS
-LOGGER_LEVEL        .. autodata_value:: LOGGER_LEVEL        .. autodata_docstring:: LOGGER_LEVEL
-LOGGER_FORMAT       .. autodata_value:: LOGGER_FORMAT       .. autodata_docstring:: LOGGER_FORMAT
-LOGGER_DATE_FORMAT  .. autodata_value:: LOGGER_DATE_FORMAT  .. autodata_docstring:: LOGGER_DATE_FORMAT
-==================  ======================================  ==========================================
+==================  ======================================  ====================================
+LOGGER_ENABLED      .. autodata_value:: LOGGER_ENABLED      Enable or disable the global logger.
+LOGGER_METHODS      .. autodata_value:: LOGGER_METHODS      A sequence of HTTP methods whose
+                                                            messages should be logged.
+LOGGER_LEVEL        .. autodata_value:: LOGGER_LEVEL        The logging level.
+LOGGER_FORMAT       .. autodata_value:: LOGGER_FORMAT       The logging format for strings.
+LOGGER_DATE_FORMAT  .. autodata_value:: LOGGER_DATE_FORMAT  The logging format for date/time.
+==================  ======================================  ====================================
 
 
 Customization

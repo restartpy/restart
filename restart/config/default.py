@@ -1,7 +1,7 @@
-# ** Action mapping **
+# -- Action mapping --
 
-#: The mapping from request methods to resource actions, which is used
-#: to find the specified action to handle the request.
+#: The mapping from request methods to resource actions, which is
+#: used to find the specified action to handle the request.
 ACTION_MAP = {
     'POST': 'create',
     'GET': 'read',
@@ -14,7 +14,7 @@ ACTION_MAP = {
 }
 
 
-# ** Parser and Renderer **
+# -- Parser and Renderer --
 
 #: The default Parser class.
 PARSER_CLASS = 'restart.parser.JSONParser'
@@ -23,7 +23,7 @@ PARSER_CLASS = 'restart.parser.JSONParser'
 RENDERER_CLASS = 'restart.renderer.JSONRenderer'
 
 
-# ** Logger **
+# -- Logger --
 
 #: Enable or disable the global logger.
 LOGGER_ENABLED = True
