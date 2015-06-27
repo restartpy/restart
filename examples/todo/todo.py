@@ -15,7 +15,7 @@ todos = {
 }
 
 
-@api.register
+@api.register(pk='<int:todo_id>')
 class Todo(Resource):
     name = 'todos'
 
@@ -23,36 +23,32 @@ class Todo(Resource):
         return todos.values()
 
     def create(self, request):
-        pk = len(todos) + 1
-        item = dict(id=pk, **request.data)
-        todos[pk] = item
-        return {'id': pk}, status.HTTP_201_CREATED
+        todo_id = max(todos.keys()) + 1
+        item = dict(id=todo_id, **request.data)
+        todos[todo_id] = item
+        return {'id': todo_id}, status.HTTP_201_CREATED
 
-    def read(self, request, pk):
-        pk = int(pk)
+    def read(self, request, todo_id):
         try:
-            return todos[pk]
+            return todos[todo_id]
         except KeyError:
             raise NotFound()
 
-    def replace(self, request, pk):
-        pk = int(pk)
-        item = dict(id=pk, **request.data)
-        todos[pk] = item
+    def replace(self, request, todo_id):
+        item = dict(id=todo_id, **request.data)
+        todos[todo_id] = item
         return '', status.HTTP_204_NO_CONTENT
 
-    def update(self, request, pk):
-        pk = int(pk)
+    def update(self, request, todo_id):
         try:
-            todos[pk].update(request.data)
+            todos[todo_id].update(request.data)
             return '', status.HTTP_204_NO_CONTENT
         except KeyError:
             raise NotFound()
 
-    def delete(self, request, pk):
-        pk = int(pk)
+    def delete(self, request, todo_id):
         try:
-            del todos[pk]
+            del todos[todo_id]
             return '', status.HTTP_204_NO_CONTENT
         except KeyError:
             raise NotFound()
