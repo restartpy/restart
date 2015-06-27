@@ -7,10 +7,20 @@ from .exceptions import HTTPException
 
 
 class Resource(object):
+    """The core class that represents a REST resource.
 
+    :param request_class: the class that is used for request objects.
+    :param response_class: the class that is used for response objects.
+    :param action_map: the mapping of request methods to resource actions.
+    """
+
+    #: The name of the resource.
     name = None
 
+    #: The class used for parser objects.
     parser_class = import_string(config.PARSER_CLASS)
+
+    #: The class used for parser objects.
     renderer_class = import_string(config.RENDERER_CLASS)
 
     def __init__(self, request_class, response_class, action_map):
@@ -20,6 +30,7 @@ class Resource(object):
 
     @property
     def logger(self):
+        """A :class:`logging.Logger` object for this API."""
         from .logging import global_logger
         return global_logger
 
@@ -32,13 +43,28 @@ class Resource(object):
         return head
 
     def log_message(self, msg):
+        """Logs a message with `DEBUG` level.
+
+        :param msg: the message to be logged.
+        """
         if self.request.method in config.LOGGER_METHODS:
             self.logger.debug('%s %s' % (self._get_head(), msg))
 
     def log_exception(self, exc):
+        """Logs an exception with `ERROR` level.
+
+        :param exc: the exception to be logged.
+        """
         self.logger.exception('Exception on %s' % self._get_head())
 
     def dispatch_request(self, request, *args, **kwargs):
+        """Does the request dispatching. Matches the HTTP method and return
+        the return value of the bound action.
+
+        :param request: the request object.
+        :param args: the positional arguments captured from the URI.
+        :param kwargs: the keyword arguments captured from the URI.
+        """
         try:
             action_name = self.action_map[request.method]
         except KeyError as exc:
@@ -68,8 +94,10 @@ class Resource(object):
         return response.finalize(self.renderer_class)
 
     def handle_exception(self, exc):
-        """Handle any exception that occurs, by returning an
-        appropriate response, or re-raising the error.
+        """Handle any exception that occurs, by returning an appropriate
+        response, or re-raising the error.
+
+        :param exc: the exception to be handled.
         """
         if isinstance(exc, HTTPException):
             headers = dict(exc.get_headers(self.request.environ))
@@ -80,6 +108,22 @@ class Resource(object):
             raise exc
 
     def make_response(self, rv):
+        """Converts the return value to a real response object that is
+        an instance of :attr:`response_class`.
+
+        The following types are allowed for `rv`:
+
+        ======================  ============================================
+        :attr:`response_class`  the object is returned unchanged
+        :class:`str`            the string becomes the response body
+        :class:`unicode`        the unicode string becomes the response body
+        :class:`tuple`          A tuple in the form ``(data, status)``
+                                or ``(data, status, headers)`` where
+                                `data` is the response body, `status` is
+                                an integer and `headers` is a dictionary
+                                with header values.
+        ======================  ============================================
+        """
         status = 200
         headers = None
 

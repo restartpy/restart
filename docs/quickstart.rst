@@ -50,12 +50,14 @@ In the world of REST APIs, resource is the first-class citizen. That is to say, 
 There are two types of resources: plural resources and singular resources.
 
 
+.. _plural-resources:
+
 Plural Resources
 ^^^^^^^^^^^^^^^^
 
 Most resources are conceptually equivalent to a collection. These resources are called **Plural Resources**.
 
-As a commonly-accepted practice, you should always use plurals in URIs for pluaral resources. Let's take the classical `Todo` application as an example. If we implement Todo as a resource, there will be two basic URLs for it::
+As a commonly-accepted practice, you should always use plurals in URIs for pluaral resources. Let's take the classical `Todo` application as an example. If we implement Todo as a resource, there will be two basic URIs for it::
 
     /todos
     /todos/123
@@ -88,6 +90,8 @@ Although we only care HTTP verb `GET` then, the possible and frequently-used HTT
 
 Note the lack of a greeting ID and usage of POST verb.
 
+
+.. _routing:
 
 Routing
 -------

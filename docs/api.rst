@@ -9,14 +9,81 @@ This section covers all the interfaces of RESTArt.
 RESTArt Object
 --------------
 
-.. autoclass:: restart.art.RESTArt
+.. module:: restart.api
+
+.. autoclass:: RESTArt
    :members:
-   :inherited-members:
+
+.. autoclass:: Rule
+   :members:
 
 
 Resource Object
 ---------------
 
-.. autoclass:: restart.resource.Resource
+.. module:: restart.resource
+
+.. autoclass:: Resource
    :members:
-   :inherited-members:
+
+
+Request Objects
+---------------
+
+.. module:: restart.request
+
+.. autoclass:: Request
+   :members:
+
+.. autoclass:: WerkzeugRequest
+   :members:
+
+
+Response Objects
+----------------
+
+.. module:: restart.response
+
+.. autoclass:: Response
+   :members:
+
+.. autoclass:: WerkzeugResponse
+   :members:
+
+
+.. _parser-objects:
+
+Parser Objects
+--------------
+
+.. module:: restart.parser
+
+.. autoclass:: Parser
+   :members:
+
+.. autoclass:: JSONParser
+   :members:
+
+
+.. _renderer-objects:
+
+Renderer  Objects
+-----------------
+
+.. module:: restart.renderer
+
+.. autoclass:: Renderer
+   :members:
+
+.. autoclass:: JSONRenderer
+   :members:
+
+
+Service Object
+--------------
+
+.. module:: restart.serving
+
+.. autoclass:: Service
+   :members:
+   :special-members: __call__
