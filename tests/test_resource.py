@@ -84,16 +84,16 @@ class TestResource(object):
         assert str(exc.value) == expected_exc_msg
 
     def test_handle_exception_with_exception(self):
-        request = fake_werkzeug_request()
         resource = self.make_resource()
+        resource.request = fake_werkzeug_request()
         with pytest.raises(Exception):
-            resource.handle_exception(request, Exception())
+            resource.handle_exception(Exception())
 
     def test_handle_exception_with_httpexception(self):
-        request = fake_werkzeug_request()
-        exc = HTTPException()
         resource = self.make_resource()
-        rv = resource.handle_exception(request, exc)
+        resource.request = fake_werkzeug_request()
+        exc = HTTPException()
+        rv = resource.handle_exception(exc)
         assert rv == ({'message': None}, None, {'Content-Type': 'text/html'})
 
     def test_make_response_with_data(self):

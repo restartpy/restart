@@ -60,19 +60,19 @@ class Resource(object):
         try:
             rv = action(request, *args, **kwargs)
         except Exception as exc:
-            rv = self.handle_exception(request, exc)
+            rv = self.handle_exception(exc)
 
         response = self.make_response(rv)
         self.log_message('<Response> %s %s' % (response.status, response.data))
 
         return response.finalize(self.renderer_class)
 
-    def handle_exception(self, request, exc):
+    def handle_exception(self, exc):
         """Handle any exception that occurs, by returning an
         appropriate response, or re-raising the error.
         """
         if isinstance(exc, HTTPException):
-            headers = dict(exc.get_headers(request.environ))
+            headers = dict(exc.get_headers(self.request.environ))
             rv = ({'message': exc.description}, exc.code, headers)
             return rv
         else:
