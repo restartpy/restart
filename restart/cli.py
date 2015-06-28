@@ -11,10 +11,16 @@ from .serving import Service
 
 @click.command()
 @click.argument('entrypoint', required=True)
-@click.option('--host', '-h', default='127.0.0.1')
-@click.option('--port', '-p', default=5000)
-@click.option('--debug', '-d', default=False)
-@click.option('--level', '-l', default='INFO')
+@click.option('--host', '-h', default='127.0.0.1',
+              help='The hostname to listen on. Set this to `0.0.0.0` to '
+                   'have the server available externally as well. Defaults '
+                   'to `127.0.0.1`.')
+@click.option('--port', '-p', default=5000,
+              help='The port of the webserver. Defaults to `5000`.')
+@click.option('--debug', '-d', default=False,
+              help='Enable or disable debug mode. Defaults to `False`.')
+@click.option('--level', '-l', default='INFO',
+              help='The logging level. Defaults to `INFO`.')
 def main(entrypoint, host, port, debug, level):
     if '.' not in sys.path:
         sys.path.insert(0, '.')
