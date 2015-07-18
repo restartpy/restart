@@ -1,32 +1,18 @@
 from __future__ import absolute_import
 
 import pytest
-from werkzeug.test import EnvironBuilder
-from werkzeug.wrappers import Request as WerkzeugSpecificRequest
 
 from restart.config import config
 from restart.resource import Resource
-from restart.request import WerkzeugRequest
 from restart.response import Response, WerkzeugResponse
 from restart.exceptions import HTTPException
+from restart.testing import RequestFactory
 
 
-def fake_werkzeug_request(method='GET', url='/', data='',
-                          content_type='application/json'):
-    if '?' in url:
-        path, query_string = url.split('?')
-    else:
-        path, query_string = url, None
-    builder = EnvironBuilder(path=path, query_string=query_string,
-                             method=method, data=data,
-                             content_type=content_type)
-    environ = builder.get_environ()
-    initial_request = WerkzeugSpecificRequest(environ)
-    request = WerkzeugRequest(initial_request)
-    return request
+factory = RequestFactory()
 
 
-class EchoResource(Resource):
+class Echo(Resource):
     name = 'echo'
 
     def read(self, request):
@@ -39,11 +25,11 @@ class EchoResource(Resource):
 class TestResource(object):
 
     def make_resource(self, action_map=config.ACTION_MAP):
-        return EchoResource(action_map)
+        return Echo(action_map)
 
     def test_dispatch_request(self):
         data = '"hello"'
-        request = fake_werkzeug_request(data=data)
+        request = factory.get('/', data=data)
         resource = self.make_resource()
         response = resource.dispatch_request(request)
 
@@ -53,7 +39,7 @@ class TestResource(object):
 
     def test_dispatch_request_with_invalid_action_map(self):
         data = '"hello"'
-        request = fake_werkzeug_request(data=data)
+        request = factory.get('/', data=data)
         resource = self.make_resource(action_map={'POST': 'create'})
 
         with pytest.raises(KeyError) as exc:
@@ -63,7 +49,7 @@ class TestResource(object):
 
     def test_dispatch_request_with_unimplemented_action(self):
         data = '"hello"'
-        request = fake_werkzeug_request(method='PATCH', data=data)
+        request = factory.patch('/', data=data)
         resource = self.make_resource()
 
         with pytest.raises(AttributeError) as exc:
@@ -73,7 +59,7 @@ class TestResource(object):
 
     def test_dispatch_request_with_action_exception(self):
         data = '"hello"'
-        request = fake_werkzeug_request(method='POST', data=data)
+        request = factory.post('/', data=data)
         resource = self.make_resource()
 
         with pytest.raises(Exception) as exc:
@@ -83,13 +69,13 @@ class TestResource(object):
 
     def test_handle_exception_with_exception(self):
         resource = self.make_resource()
-        resource.request = fake_werkzeug_request()
+        resource.request = factory.get('/')
         with pytest.raises(Exception):
             resource.handle_exception(Exception())
 
     def test_handle_exception_with_httpexception(self):
         resource = self.make_resource()
-        resource.request = fake_werkzeug_request()
+        resource.request = factory.get('/')
         exc = HTTPException()
         rv = resource.handle_exception(exc)
         assert rv == ({'message': None}, None, {'Content-Type': 'text/html'})
