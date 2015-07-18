@@ -7,20 +7,36 @@ from restart.response import Response, WerkzeugResponse
 from restart.renderer import JSONRenderer
 
 
-class TestRequest(object):
+class TestResponse(object):
 
-    def test_response(self):
+    def test_normal_response(self):
+        response = Response({'hello': 'world'})
+        assert str(response) == '<Response [200]>'
+        assert response.data == {'hello': 'world'}
+
+    def test_rendered_response(self):
+        response = Response({'hello': 'world'})
+        rendered_response = response.render(JSONRenderer)
+
+        assert rendered_response.data == '{"hello": "world"}'
+
+    def test_specific_response(self):
         response = Response({'hello': 'world'})
 
         with pytest.raises(NotImplementedError):
-            response.finalize(JSONRenderer)
+            response.get_specific_response()
 
-    def test_werkzeug_request(self):
+
+class TestWerkzeugResponse(object):
+
+    def test_specific_rendered_response(self):
         response = WerkzeugResponse({'hello': 'world'})
-        final_response = response.finalize(JSONRenderer)
+        rendered_response = response.render(JSONRenderer)
+        specific_response = rendered_response.get_specific_response()
 
-        assert isinstance(final_response, WerkzeugSpecificResponse)
-        assert final_response.data == '{"hello": "world"}'
-        assert final_response.status_code == 200
-        assert final_response.status == '200 OK'
-        assert final_response.headers['Content-Type'] == 'application/json'
+        assert isinstance(specific_response, WerkzeugSpecificResponse)
+        assert str(response) == '<WerkzeugResponse [200]>'
+        assert specific_response.data == '{"hello": "world"}'
+        assert specific_response.status_code == 200
+        assert specific_response.status == '200 OK'
+        assert specific_response.headers['Content-Type'] == 'application/json'

@@ -7,24 +7,33 @@ class Request(object):
     """The base request class used in RESTArt.
 
     :param initial_request: the initial request, which is framework-specific.
-    :param parser_class: the parser class used to parse the request data.
-                         See :ref:`parser-objects` for information about
-                         parsers.
     """
 
-    def __init__(self, initial_request, parser_class):
+    def __init__(self, initial_request):
         self.initial_request = initial_request
-        self.parser = parser_class()
+        self.data = self.get_data()
 
-    @locked_cached_property
-    def data(self):
-        """A dictionary with the parsed request payload. If the request
-        payload is empty, an empty dictionary will be returned."""
-        raw = self.get_data()
-        if not raw:
-            return {}
-        parsed = self.parser.parse(raw)
-        return parsed
+    def parse(self, parser_class):
+        """Return a request object with the data parsed, which is a
+        dictionary. If the request data is empty, the parsed data
+        will be an empty dictionary.
+
+        :param parser_class: the parser class used to parse the request data.
+                             See :ref:`parser-objects` for information about
+                             parsers.
+        """
+        parser = parser_class()
+        if not self.data:
+            self.data = {}
+        else:
+            self.data = parser.parse(self.data)
+        return self
+
+    def __str__(self):
+        return "<{} [{} '{}']>".format(self.__class__.__name__,
+                                       self.method, self.uri)
+
+    __repr__ = __str__
 
     @locked_cached_property
     def method(self):

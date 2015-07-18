@@ -6,7 +6,7 @@ from werkzeug.wrappers import Response as WerkzeugSpecificResponse
 class Response(object):
     """The base response class used in RESTArt.
 
-    :param data: the reponse body.
+    :param data: the response body.
     :param status: an integer that represents an HTTP status code.
     :param headers: a dictionary with HTTP header values.
     """
@@ -16,8 +16,8 @@ class Response(object):
         self.status = status
         self.headers = headers or {}
 
-    def finalize(self, renderer_class):
-        """Make the rendered and final response.
+    def render(self, renderer_class):
+        """Return a response object with the data rendered.
 
         :param renderer_class: the renderer class used to render the
                                response data. See :ref:`renderer-objects`
@@ -26,7 +26,12 @@ class Response(object):
         renderer = renderer_class()
         self.data = renderer.render(self.data)
         self.headers.update({'Content-Type': renderer.content_type})
-        return self.get_specific_response()
+        return self
+
+    def __str__(self):
+        return '<{} [{}]>'.format(self.__class__.__name__, self.status)
+
+    __repr__ = __str__
 
     def get_specific_response(self):
         """Get the framework-specific response."""

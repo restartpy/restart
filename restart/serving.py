@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
-from werkzeug.routing import Map, Rule
 from werkzeug.wrappers import Request, Response
 from werkzeug.serving import run_simple
 from werkzeug.exceptions import NotFound
+
+from .adapter import WerkzeugAdapter
 
 
 class Service(object):
@@ -11,12 +12,15 @@ class Service(object):
 
     :param api: the RESTArt API.
     """
+
+    #: The class that is used to adapt the api object.  See
+    #: :class:`~restart.adapter.WerkzeugAdapter` for more information.
+    adapter_class = WerkzeugAdapter
+
     def __init__(self, api):
-        self.raw_rules = api.rules
-        self.rule_map = Map([
-            Rule(rule.uri, endpoint=endpoint, methods=rule.methods)
-            for endpoint, rule in self.raw_rules.iteritems()
-        ])
+        adapter = self.adapter_class(api)
+        self.adapted_rules = adapter.adapted_rules
+        self.final_rules = adapter.final_rules
 
     def wsgi_app(self, environ, start_response):
         """The actual WSGI application.
@@ -27,13 +31,13 @@ class Service(object):
                                to start the response
         """
         request = Request(environ)
-        adapter = self.rule_map.bind_to_environ(request.environ)
+        adapter = self.final_rules.bind_to_environ(request.environ)
         try:
             endpoint, kwargs = adapter.match()
         except NotFound:
             response = Response('The requested URI was not found.', 404)
         else:
-            response = self.raw_rules[endpoint].handler(request, **kwargs)
+            response = self.adapted_rules[endpoint].handler(request, **kwargs)
         return response(environ, start_response)
 
     def __call__(self, environ, start_response):

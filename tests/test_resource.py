@@ -3,12 +3,11 @@ from __future__ import absolute_import
 import pytest
 from werkzeug.test import EnvironBuilder
 from werkzeug.wrappers import Request as WerkzeugSpecificRequest
-from werkzeug.wrappers import Response as WerkzeugSpecificResponse
 
 from restart.config import config
 from restart.resource import Resource
 from restart.request import WerkzeugRequest
-from restart.response import WerkzeugResponse
+from restart.response import Response, WerkzeugResponse
 from restart.exceptions import HTTPException
 
 
@@ -22,7 +21,8 @@ def fake_werkzeug_request(method='GET', url='/', data='',
                              method=method, data=data,
                              content_type=content_type)
     environ = builder.get_environ()
-    request = WerkzeugSpecificRequest(environ)
+    initial_request = WerkzeugSpecificRequest(environ)
+    request = WerkzeugRequest(initial_request)
     return request
 
 
@@ -38,10 +38,8 @@ class EchoResource(Resource):
 
 class TestResource(object):
 
-    def make_resource(self, request_class=WerkzeugRequest,
-                      response_class=WerkzeugResponse,
-                      action_map=config.ACTION_MAP):
-        return EchoResource(request_class, response_class, action_map)
+    def make_resource(self, action_map=config.ACTION_MAP):
+        return EchoResource(action_map)
 
     def test_dispatch_request(self):
         data = '"hello"'
@@ -49,9 +47,9 @@ class TestResource(object):
         resource = self.make_resource()
         response = resource.dispatch_request(request)
 
-        assert isinstance(response, WerkzeugSpecificResponse)
+        assert isinstance(response, Response)
         assert response.data == data
-        assert response.status_code == 200
+        assert response.status == 200
 
     def test_dispatch_request_with_invalid_action_map(self):
         data = '"hello"'
@@ -101,7 +99,7 @@ class TestResource(object):
         resource = self.make_resource()
         response = resource.make_response(rv)
 
-        assert isinstance(response, resource.response_class)
+        assert isinstance(response, Response)
         assert response.data == rv
         assert response.status == 200
         assert response.headers == {}
@@ -111,7 +109,7 @@ class TestResource(object):
         resource = self.make_resource()
         response = resource.make_response(rv)
 
-        assert isinstance(response, resource.response_class)
+        assert isinstance(response, Response)
         assert response.data == rv[0]
         assert response.status == rv[1]
         assert response.headers == {}
@@ -121,7 +119,7 @@ class TestResource(object):
         resource = self.make_resource()
         response = resource.make_response(rv)
 
-        assert isinstance(response, resource.response_class)
+        assert isinstance(response, Response)
         assert response.data == rv[0]
         assert response.status == rv[1]
         assert response.headers == rv[2]
@@ -132,7 +130,7 @@ class TestResource(object):
         resource = self.make_resource()
         response = resource.make_response(rv)
 
-        assert isinstance(response, WerkzeugResponse)
+        assert isinstance(response, Response)
         assert response.data == rv.data
         assert response.status == rv.status
         assert response.headers == rv.headers

@@ -4,13 +4,12 @@ from werkzeug.utils import import_string
 
 from .config import config
 from .exceptions import HTTPException
+from .response import Response
 
 
 class Resource(object):
     """The core class that represents a REST resource.
 
-    :param request_class: the class that is used for request objects.
-    :param response_class: the class that is used for response objects.
     :param action_map: the mapping of request methods to resource actions.
     """
 
@@ -23,9 +22,7 @@ class Resource(object):
     #: The class used for parser objects.
     renderer_class = import_string(config.RENDERER_CLASS)
 
-    def __init__(self, request_class, response_class, action_map):
-        self.request_class = request_class
-        self.response_class = response_class
+    def __init__(self, action_map):
         self.action_map = action_map
 
     @property
@@ -79,8 +76,7 @@ class Resource(object):
             exc.args = ('Unimplemented action %r' % action_name,)
             raise
 
-        request = self.request_class(request, self.parser_class)
-        self.request = request
+        self.request = request.parse(self.parser_class)
         self.log_message('<Request> %s' % request.data)
 
         try:
@@ -91,7 +87,7 @@ class Resource(object):
         response = self.make_response(rv)
         self.log_message('<Response> %s %s' % (response.status, response.data))
 
-        return response.finalize(self.renderer_class)
+        return response.render(self.renderer_class)
 
     def handle_exception(self, exc):
         """Handle any exception that occurs, by returning an appropriate
@@ -109,12 +105,12 @@ class Resource(object):
 
     def make_response(self, rv):
         """Converts the return value to a real response object that is
-        an instance of :attr:`response_class`.
+        an instance of :class:`~restart.response.Response`.
 
         The following types are allowed for `rv`:
 
         ======================  ============================================
-        :attr:`response_class`  the object is returned unchanged
+        :class:`Response`       the object is returned unchanged
         :class:`str`            the string becomes the response body
         :class:`unicode`        the unicode string becomes the response body
         :class:`tuple`          A tuple in the form ``(data, status)``
@@ -138,7 +134,7 @@ class Resource(object):
 
         if rv is None:
             raise ValueError('Resource action did not return a response')
-        elif not isinstance(rv, self.response_class):
-            rv = self.response_class(rv, status=status, headers=headers)
+        elif not isinstance(rv, Response):
+            rv = Response(rv, status=status, headers=headers)
 
         return rv
