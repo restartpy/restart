@@ -11,8 +11,10 @@ class TestResponse(object):
 
     def test_normal_response(self):
         response = Response({'hello': 'world'})
-        assert str(response) == '<Response [200]>'
+        assert str(response) == '<Response [200 OK]>'
         assert response.data == {'hello': 'world'}
+        assert response.status_code == 200
+        assert response.status == '200 OK'
 
     def test_rendered_response(self):
         response = Response({'hello': 'world'})
@@ -35,7 +37,7 @@ class TestWerkzeugResponse(object):
         specific_response = rendered_response.get_specific_response()
 
         assert isinstance(specific_response, WerkzeugSpecificResponse)
-        assert str(response) == '<WerkzeugResponse [200]>'
+        assert str(response) == '<WerkzeugResponse [200 OK]>'
         assert specific_response.data == '{"hello": "world"}'
         assert specific_response.status_code == 200
         assert specific_response.status == '200 OK'

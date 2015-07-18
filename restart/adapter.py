@@ -38,7 +38,7 @@ class Adapter(object):
                 adapted_request = self.request_class(request)
                 response = handler(adapted_request, *args, **kwargs)
                 adapted_response = self.response_class(
-                    response.data, response.status, response.headers
+                    response.data, response.status_code, response.headers
                 )
                 return adapted_response.get_specific_response()
             return adapted_handler

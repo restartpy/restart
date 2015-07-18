@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from werkzeug.http import HTTP_STATUS_CODES
 from werkzeug.wrappers import Response as WerkzeugSpecificResponse
 
 
@@ -13,8 +14,17 @@ class Response(object):
 
     def __init__(self, data, status=200, headers=None):
         self.data = data
-        self.status = status
+        self.status_code = status
         self.headers = headers or {}
+
+    @property
+    def status(self):
+        code = self.status_code
+        try:
+            _status = '%d %s' % (code, HTTP_STATUS_CODES[code].upper())
+        except KeyError:
+            _status = '%d UNKNOWN' % code
+        return _status
 
     def render(self, renderer_class):
         """Return a response object with the data rendered.
@@ -43,4 +53,5 @@ class WerkzeugResponse(Response):
 
     def get_specific_response(self):
         """Get the Werkzeug-specific response."""
-        return WerkzeugSpecificResponse(self.data, self.status, self.headers)
+        return WerkzeugSpecificResponse(self.data, self.status_code,
+                                        self.headers)

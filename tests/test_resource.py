@@ -49,7 +49,7 @@ class TestResource(object):
 
         assert isinstance(response, Response)
         assert response.data == data
-        assert response.status == 200
+        assert response.status_code == 200
 
     def test_dispatch_request_with_invalid_action_map(self):
         data = '"hello"'
@@ -101,7 +101,7 @@ class TestResource(object):
 
         assert isinstance(response, Response)
         assert response.data == rv
-        assert response.status == 200
+        assert response.status_code == 200
         assert response.headers == {}
 
     def test_make_response_with_data_status(self):
@@ -111,7 +111,7 @@ class TestResource(object):
 
         assert isinstance(response, Response)
         assert response.data == rv[0]
-        assert response.status == rv[1]
+        assert response.status_code == rv[1]
         assert response.headers == {}
 
     def test_make_response_with_data_status_headers(self):
@@ -121,7 +121,7 @@ class TestResource(object):
 
         assert isinstance(response, Response)
         assert response.data == rv[0]
-        assert response.status == rv[1]
+        assert response.status_code == rv[1]
         assert response.headers == rv[2]
 
     def test_make_response_with_response(self):
@@ -132,5 +132,6 @@ class TestResource(object):
 
         assert isinstance(response, Response)
         assert response.data == rv.data
+        assert response.status_code == rv.status_code
         assert response.status == rv.status
         assert response.headers == rv.headers
