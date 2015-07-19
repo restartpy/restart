@@ -103,6 +103,7 @@ class RESTArt(object):
             you must add `'OPTIONS'` into the `methods` parameter explicitly
             when using the :meth:`route` and :meth:`add_rule` methods.
 
+
         :param cls: the class that will be decorated.
         :param prefix: the URI prefix for the resource. If not specified,
                        the resource :attr:`~restart.resource.Resource.name`

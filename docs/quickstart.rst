@@ -96,7 +96,7 @@ Note the lack of a greeting ID and usage of POST verb.
 Routing
 -------
 
-With the above concepts and conventions in mind, RESTArt provide three methods to route a resource: :meth:`~restart.api.RESTArt.register`, :meth:`~restart.api.RESTArt.route` and :meth:`~restart.api.RESTArt.add_rule`.
+With the above concepts and conventions in mind, RESTArt provides three methods to route a resource: :meth:`~restart.api.RESTArt.register`, :meth:`~restart.api.RESTArt.route` and :meth:`~restart.api.RESTArt.add_rule`.
 
 
 register()

@@ -16,6 +16,8 @@ This section covers most things you need to know to build REST APIs with RESTArt
    quickstart
    serving
    configuration
+   middleware
+   testing
 
 
 API Reference

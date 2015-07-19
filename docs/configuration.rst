@@ -37,7 +37,7 @@ RENDERER_CLASS  .. autodata_value:: RENDERER_CLASS  The default Renderer class.
 
 
 Logger
-^^^^^^^^^^^^^^^^^^^
+^^^^^^
 
 ==================  ======================================  ====================================
 Option name         Default value                           Description
@@ -49,6 +49,36 @@ LOGGER_LEVEL        .. autodata_value:: LOGGER_LEVEL        The logging level.
 LOGGER_FORMAT       .. autodata_value:: LOGGER_FORMAT       The logging format for strings.
 LOGGER_DATE_FORMAT  .. autodata_value:: LOGGER_DATE_FORMAT  The logging format for date/time.
 ==================  ======================================  ====================================
+
+
+Middlewares
+^^^^^^^^^^^
+
+==================  ======================================  ====================================
+Option name         Default value                           Description
+==================  ======================================  ====================================
+MIDDLEWARE_CLASSES  .. autodata_value:: MIDDLEWARE_CLASSES  The middleware classes used to alter
+                                                            RESTArt's requests and responses.
+==================  ======================================  ====================================
+
+
+CORS (Cross-Origin Resource Sharing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+======================  ==========================================  =====================================
+Option name             Default value                               Description
+======================  ==========================================  =====================================
+CORS_ALLOW_ORIGIN       .. autodata_value:: CORS_ALLOW_ORIGIN       The option that determines the header
+                                                                    ``Access-Control-Allow-Origin``.
+CORS_ALLOW_CREDENTIALS  .. autodata_value:: CORS_ALLOW_CREDENTIALS  The option that determines the header
+                                                                    ``Access-Control-Allow-Credentials``.
+CORS_ALLOW_METHODS      .. autodata_value:: CORS_ALLOW_METHODS      The option that determines the header
+                                                                    ``Access-Control-Allow-Methods``.
+CORS_ALLOW_HEADERS      .. autodata_value:: CORS_ALLOW_HEADERS      The option that determines the header
+                                                                    ``Access-Control-Allow-Headers``.
+CORS_MAX_AGE            .. autodata_value:: CORS_MAX_AGE            The option that determines the header
+                                                                    ``Access-Control-Max-Age``.
+======================  ==========================================  =====================================
 
 
 Customization

@@ -82,7 +82,10 @@ class Resource(object):
         return response.render(self.renderer_class)
 
     def find_action(self, request):
-        """Find the appropriate action according to the request method."""
+        """Find the appropriate action according to the request method.
+
+        :param request: the request object.
+        """
         try:
             action_name = self.action_map[request.method]
         except KeyError as exc:
@@ -133,7 +136,6 @@ class Resource(object):
             (because an earlier middleware method returned a
             :class:`~restart.response.Response`).
 
-        :param action: the action to perform.
         :param args: a list of positional arguments that will be passed
                      to the action.
         :param kwargs: a dictionary of keyword arguments that will be passed

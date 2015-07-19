@@ -63,11 +63,16 @@ class CORSMiddleware(object):
         return headers
 
     def is_preflight_request(self, request):
+        """Judge if the `request` object is a preflight request."""
         return (request.method == 'OPTIONS' and
                 'Origin' in request.headers and
                 'Access-Control-Request-Method' in request.headers)
 
     def process_request(self, request):
+        """Handle the preflight request correctly.
+
+        :param request: the request object.
+        """
         if self.is_preflight_request(request):
             request_headers = request.headers.get(
                 'Access-Control-Request-Headers'
@@ -76,6 +81,11 @@ class CORSMiddleware(object):
             return '', 200, headers
 
     def process_response(self, request, response):
+        """Add appropriate response headers for the actual request.
+
+        :param request: the request object.
+        :param response: the response object.
+        """
         if not self.is_preflight_request(request):
             headers = self.make_actual_headers()
             response.headers.update(headers)

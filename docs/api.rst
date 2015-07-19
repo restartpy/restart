@@ -79,6 +79,27 @@ Renderer  Objects
    :members:
 
 
+Middleware Objects
+------------------
+
+.. module:: restart.middlewares
+
+.. autoclass:: CORSMiddleware
+   :members:
+
+
+Adapter Objects
+---------------
+
+.. module:: restart.adapter
+
+.. autoclass:: Adapter
+   :members:
+
+.. autoclass:: WerkzeugAdapter
+   :members:
+
+
 Service Object
 --------------
 
