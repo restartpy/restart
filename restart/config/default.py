@@ -29,7 +29,7 @@ RENDERER_CLASS = 'restart.renderer.JSONRenderer'
 LOGGER_ENABLED = True
 
 #: A sequence of HTTP methods whose messages should be logged
-LOGGER_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+LOGGER_METHODS = ('GET', 'POST', 'PUT', 'PATCH', 'DELETE')
 
 #: The logging level.
 LOGGER_LEVEL = 'INFO'
@@ -39,3 +39,9 @@ LOGGER_FORMAT = '%(asctime)s.%(msecs)03d %(name)-10s %(levelname)-8s %(message)s
 
 #: The logging format for date/time.
 LOGGER_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+
+# -- Middlewares --
+
+#: The middleware classes used to alter RESTArt's requests and responses.
+MIDDLEWARE_CLASSES = ()

@@ -12,7 +12,27 @@ from restart.testing import RequestFactory
 factory = RequestFactory()
 
 
+class RefuseRequestMiddleware(object):
+
+    def process_request(self, request):
+        return 'You are refused'
+
+
+class AlterRequestMiddleware(object):
+
+    def process_request(self, request):
+        request.data += ' (altered)'
+
+
+class AlterResponseMiddleware(object):
+
+    def process_response(self, request, response):
+        response.status_code = 201
+        return response
+
+
 class Echo(Resource):
+
     name = 'echo'
 
     def read(self, request):
@@ -79,6 +99,46 @@ class TestResource(object):
         exc = HTTPException()
         rv = resource.handle_exception(exc)
         assert rv == ({'message': None}, None, {'Content-Type': 'text/html'})
+
+    def test_perform_action_with_request_middlewares(self):
+        # Save and change middlewares of Echo class
+        initial_middlewares = Echo.middlewares
+        Echo.middlewares = (
+            RefuseRequestMiddleware(),
+            AlterRequestMiddleware()
+        )
+
+        data = '"hello"'
+        request = factory.get('/', data=data)
+        resource = self.make_resource()
+        response = resource.dispatch_request(request)
+
+        assert isinstance(response, Response)
+        assert response.data == '"You are refused"'
+        assert response.status_code == 200
+
+        # Retrieve middlewares of Echo class
+        Echo.middlewares = initial_middlewares
+
+    def test_perform_action_with_alter_middlewares(self):
+        # Save and change middlewares of Echo class
+        initial_middlewares = Echo.middlewares
+        Echo.middlewares = (
+            AlterRequestMiddleware(),
+            AlterResponseMiddleware()
+        )
+
+        data = '"hello"'
+        request = factory.get('/', data=data)
+        resource = self.make_resource()
+        response = resource.dispatch_request(request)
+
+        assert isinstance(response, Response)
+        assert response.data == '"hello (altered)"'
+        assert response.status_code == 201
+
+        # Retrieve middlewares of Echo class
+        Echo.middlewares = initial_middlewares
 
     def test_make_response_with_data(self):
         rv = {'hello': 'world'}

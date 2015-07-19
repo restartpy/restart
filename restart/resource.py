@@ -22,6 +22,12 @@ class Resource(object):
     #: The class used for parser objects.
     renderer_class = import_string(config.RENDERER_CLASS)
 
+    #: The instances of middleware classes.
+    middlewares = tuple(
+        import_string(middleware_class)()
+        for middleware_class in config.MIDDLEWARE_CLASSES
+    )
+
     def __init__(self, action_map):
         self.action_map = action_map
 
@@ -80,7 +86,7 @@ class Resource(object):
         self.log_message('<Request> %s' % request.data)
 
         try:
-            rv = action(request, *args, **kwargs)
+            rv = self.perform_action(action, *args, **kwargs)
         except Exception as exc:
             rv = self.handle_exception(exc)
 
@@ -88,6 +94,69 @@ class Resource(object):
         self.log_message('<Response> %s %s' % (response.status, response.data))
 
         return response.render(self.renderer_class)
+
+    def perform_action(self, action, *args, **kwargs):
+        """Perform the specified action. Also apply all possible `process_*`
+        methods of middleware instances in `self.middlewares`.
+
+        During request phase:
+
+            :meth:`process_request` methods are called on each request,
+            before RESTArt calls the `action`, in order.
+
+            It should return :attr:`None` or any other value that
+            :attr:`~restart.resource.Resource.make_response` can recognize.
+            If it returns :attr:`None`, RESTArt will continue processing
+            the request, executing any other :meth:`process_request` and,
+            then, the `action`. If it returns any other value (e.g.
+            a :class:`~restart.response.Response` object), RESTArt won't
+            bother calling any other middleware or the `action`.
+
+        During response phase:
+
+            :meth:`process_response` methods are called on all responses
+            before they'are returned to the client, in reverse order.
+
+            It must return a value that can be converted to a
+            :class:`~restart.response.Response` object by
+            :attr:`~restart.resource.Resource.make_response`. It could alter
+            and return the given `response`, or it could create and return
+            a brand-new value.
+
+            Unlike :meth:`process_request` methods, the
+            :meth:`process_response` method is always called, even if the
+            :meth:`process_request` of the same middleware were skipped
+            (because an earlier middleware method returned a
+            :class:`~restart.response.Response`).
+
+        :param action: the action to perform.
+        :param args: a list of positional arguments that will be passed
+                     to the action.
+        :param kwargs: a dictionary of keyword arguments that will be passed
+                       to the action.
+        """
+        rv = None
+
+        # Call possible `process_request` methods of middlewares
+        for middleware in self.middlewares:
+            if hasattr(middleware, 'process_request'):
+                rv = middleware.process_request(self.request)
+                if rv is not None:
+                    break
+
+        # Call the `action`
+        if rv is None:
+            rv = action(self.request, *args, **kwargs)
+
+        # Call all `process_response` methods of middlewares
+        for middleware in reversed(self.middlewares):
+            if hasattr(middleware, 'process_response'):
+                # Ensure that the second parameter passed to the
+                # `process_response` method is a `Response` object
+                response = self.make_response(rv)
+                rv = middleware.process_response(self.request, response)
+
+        return rv
 
     def handle_exception(self, exc):
         """Handle any exception that occurs, by returning an appropriate
