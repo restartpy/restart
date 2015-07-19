@@ -61,11 +61,11 @@ class TestAPI(object):
         list_rule = api.rules['users_list']
         self.assert_rule(
             list_rule,
-            ('/users', ['GET', 'POST'], User)
+            ('/users', ['OPTIONS', 'GET', 'POST'], User)
         )
 
         item_rule = api.rules['users_item']
         self.assert_rule(
             item_rule,
-            ('/users/<pk>', ['GET', 'PUT', 'PATCH', 'DELETE'], User)
+            ('/users/<pk>', ['OPTIONS', 'GET', 'PUT', 'PATCH', 'DELETE'], User)
         )

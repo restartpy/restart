@@ -95,6 +95,14 @@ class RESTArt(object):
         """A special decorator that is used to register a plural resource.
         See :ref:`routing` for more information.
 
+        Important note:
+
+            Unlike the :meth:`route` and :meth:`add_rule` methods,
+            `'OPTIONS'` is always allowed implicitly in :meth:`register`
+            to handle potential CORS. In order to achieve the same purpose,
+            you must add `'OPTIONS'` into the `methods` parameter explicitly
+            when using the :meth:`route` and :meth:`add_rule` methods.
+
         :param cls: the class that will be decorated.
         :param prefix: the URI prefix for the resource. If not specified,
                        the resource :attr:`~restart.resource.Resource.name`
@@ -122,14 +130,13 @@ class RESTArt(object):
             actual_list_actions = {'GET': 'index'}
             if list_actions:
                 actual_list_actions.update(list_actions)
-
             self.add_rule(cls, actual_prefix,
                           endpoint='%s_list' % cls.name,
-                          methods=['GET', 'POST'],
+                          methods=['OPTIONS', 'GET', 'POST'],
                           actions=actual_list_actions)
             self.add_rule(cls, '%s/%s' % (actual_prefix, pk),
                           endpoint='%s_item' % cls.name,
-                          methods=['GET', 'PUT', 'PATCH', 'DELETE'],
+                          methods=['OPTIONS', 'GET', 'PUT', 'PATCH', 'DELETE'],
                           actions=item_actions)
             return cls
         if cls:
