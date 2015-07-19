@@ -68,6 +68,21 @@ class Resource(object):
         :param args: the positional arguments captured from the URI.
         :param kwargs: the keyword arguments captured from the URI.
         """
+        self.request = request.parse(self.parser_class)
+        self.log_message('<Request> %s' % request.data)
+
+        try:
+            rv = self.perform_action(*args, **kwargs)
+        except Exception as exc:
+            rv = self.handle_exception(exc)
+
+        response = self.make_response(rv)
+        self.log_message('<Response> %s %s' % (response.status, response.data))
+
+        return response.render(self.renderer_class)
+
+    def find_action(self, request):
+        """Find the appropriate action according to the request method."""
         try:
             action_name = self.action_map[request.method]
         except KeyError as exc:
@@ -82,21 +97,10 @@ class Resource(object):
             exc.args = ('Unimplemented action %r' % action_name,)
             raise
 
-        self.request = request.parse(self.parser_class)
-        self.log_message('<Request> %s' % request.data)
+        return action
 
-        try:
-            rv = self.perform_action(action, *args, **kwargs)
-        except Exception as exc:
-            rv = self.handle_exception(exc)
-
-        response = self.make_response(rv)
-        self.log_message('<Response> %s %s' % (response.status, response.data))
-
-        return response.render(self.renderer_class)
-
-    def perform_action(self, action, *args, **kwargs):
-        """Perform the specified action. Also apply all possible `process_*`
+    def perform_action(self, *args, **kwargs):
+        """Perform the appropriate action. Also apply all possible `process_*`
         methods of middleware instances in `self.middlewares`.
 
         During request phase:
@@ -146,6 +150,7 @@ class Resource(object):
 
         # Call the `action`
         if rv is None:
+            action = self.find_action(self.request)
             rv = action(self.request, *args, **kwargs)
 
         # Call all `process_response` methods of middlewares
