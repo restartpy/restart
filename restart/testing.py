@@ -38,7 +38,7 @@ class Client(WerkzeugClient):
         return self.wrap_response(response)
 
 
-class RequestFactory(Client):
+class RequestFactory(WerkzeugClient):
     """The class used to generate request objects.
 
     Example::
