@@ -48,7 +48,8 @@ class Request(object):
     @locked_cached_property
     def path(self):
         """The request path as unicode, which will always include a leading
-        slash, even if the URI root is accessed."""
+        slash, even if the URI root is accessed.
+        """
         return self.get_path()
 
     @locked_cached_property
@@ -65,6 +66,11 @@ class Request(object):
     def scheme(self):
         """URI scheme (http or https)."""
         return self.get_scheme()
+
+    @locked_cached_property
+    def headers(self):
+        """The request headers."""
+        return self.get_headers()
 
     @locked_cached_property
     def environ(self):
@@ -99,6 +105,10 @@ class Request(object):
         """Get the request scheme."""
         raise NotImplementedError()
 
+    def get_headers(self):
+        """Get the request headers."""
+        raise NotImplementedError()
+
     def get_environ(self):
         """Get the request WSGI environment."""
         raise NotImplementedError()
@@ -109,27 +119,32 @@ class WerkzeugRequest(Request):
 
     def get_data(self):
         """Get the request data from the Werkzeug-specific
-        request object."""
+        request object.
+        """
         return self.initial_request.data
 
     def get_method(self):
         """Get the request method from the Werkzeug-specific
-        request object."""
+        request object.
+        """
         return self.initial_request.method
 
     def get_uri(self):
         """Get the request URI from the Werkzeug-specific
-        request object."""
+        request object.
+        """
         return self.initial_request.url
 
     def get_path(self):
         """Get the request path from the Werkzeug-specific
-        request object."""
+        request object.
+        """
         return self.initial_request.path
 
     def get_args(self):
         """Get the request URI parameters from the Werkzeug-specific
-        request object."""
+        request object.
+        """
         args = {
             k: v if len(v) > 1 else v[0]
             for k, v in self.initial_request.args.iterlists()
@@ -138,15 +153,24 @@ class WerkzeugRequest(Request):
 
     def get_auth(self):
         """Get the request authorization data from the Werkzeug-specific
-        request object."""
+        request object.
+        """
         return self.initial_request.authorization
 
     def get_scheme(self):
         """Get the request scheme from the Werkzeug-specific
-        request object."""
+        request object.
+        """
         return self.initial_request.scheme
+
+    def get_headers(self):
+        """Get the request headers from the Werkzeug-specific
+        request object.
+        """
+        return dict(self.initial_request.headers)
 
     def get_environ(self):
         """Get the WSGI environment from the Werkzeug-specific
-        request object."""
+        request object.
+        """
         return self.initial_request.environ

@@ -39,7 +39,8 @@ class TestWerkzeugRequest(object):
 
     def test_normal_request(self):
         initial_request = factory.post('/sample?x=1&y=2',
-                                       data='{"hello": "world"}')
+                                       data='{"hello": "world"}',
+                                       content_type='application/json')
         request = WerkzeugRequest(initial_request)
         assert (str(request) ==
                 "<WerkzeugRequest [POST 'http://localhost/sample?x=1&y=2']>")
@@ -50,6 +51,8 @@ class TestWerkzeugRequest(object):
         assert request.args == {'x': '1', 'y': '2'}
         assert request.auth is None
         assert request.scheme == 'http'
+        assert request.headers['Host'] == 'localhost'
+        assert request.headers['Content-Type'] == 'application/json'
         assert_environ(request.environ)
 
     def test_parsed_request(self):
@@ -69,6 +72,7 @@ class TestWerkzeugRequest(object):
         assert request.args == {}
         assert request.auth is None
         assert request.scheme == 'http'
+        assert request.headers['Host'] == 'localhost'
         assert_environ(request.environ)
 
     def test_parsed_request_with_empty_data(self):
