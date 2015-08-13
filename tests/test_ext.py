@@ -30,6 +30,7 @@ class TestUtils(object):
         # restart extension package
         mkdir('restart_package')
         mkfile('restart_package/__init__.py', 'ext_id = "restart_package"')
+        mkfile('restart_package/module.py', 'mod_id = "restart_package_module"')
 
         os.chdir(origin_cwd)
 
@@ -57,3 +58,12 @@ class TestUtils(object):
         from restart.ext import package
         assert package.ext_id == 'restart_package'
         assert package.__name__ == 'restart_package'
+
+    def test_restart_ext_package_import_inner_normal(self):
+        from restart.ext.package.module import mod_id
+        assert mod_id == 'restart_package_module'
+
+    def test_restart_ext_package_import_inner_module(self):
+        from restart.ext.package import module
+        assert module.mod_id == 'restart_package_module'
+        assert module.__name__ == 'restart_package.module'

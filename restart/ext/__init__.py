@@ -8,6 +8,7 @@ class ExtensionImporter(object):
     """
 
     sys = __import__('sys')
+    importlib = __import__('importlib')
 
     def __init__(self, target_module, original_module):
         self.target_module = target_module
@@ -24,11 +25,17 @@ class ExtensionImporter(object):
             return self
 
     def load_module(self, fullname):
+        # Check the cache first
         if fullname in self.sys.modules:
             return self.sys.modules[fullname]
+
         modname = fullname.split('.', self.prefix_cutoff)[self.prefix_cutoff]
         realname = self.target_module % modname
-        module = self.sys.modules[fullname] = __import__(realname)
+        module = self.importlib.import_module(realname)
+
+        # Map `fullname` to `module` (used as a cache later)
+        self.sys.modules[fullname] = module
+
         return module
 
 
