@@ -11,7 +11,6 @@ class Request(object):
 
     def __init__(self, initial_request):
         self.initial_request = initial_request
-        self.data = self.get_data()
 
     def parse(self, parser_class):
         """Return a request object with the data parsed, which is a
@@ -24,9 +23,9 @@ class Request(object):
         """
         parser = parser_class()
         if not self.data:
-            self.data = {}
+            self._data = {}
         else:
-            self.data = parser.parse(self.data)
+            self._data = parser.parse(self.data)
         return self
 
     def __str__(self):
@@ -35,44 +34,49 @@ class Request(object):
 
     __repr__ = __str__
 
-    @locked_cached_property
+    @locked_cached_property(name='_data')
+    def data(self):
+        """The request payload."""
+        return self.get_data()
+
+    @locked_cached_property(name='_method')
     def method(self):
         """The request method. (For example `'GET'` or `'POST'`)."""
         return self.get_method()
 
-    @locked_cached_property
+    @locked_cached_property(name='_uri')
     def uri(self):
         """The request URI."""
         return self.get_uri()
 
-    @locked_cached_property
+    @locked_cached_property(name='_path')
     def path(self):
         """The request path as unicode, which will always include a leading
         slash, even if the URI root is accessed.
         """
         return self.get_path()
 
-    @locked_cached_property
+    @locked_cached_property(name='_args')
     def args(self):
         """A dictionary with the parsed URI parameters."""
         return self.get_args()
 
-    @locked_cached_property
+    @locked_cached_property(name='_auth')
     def auth(self):
         """The authorization data from the request."""
         return self.get_auth()
 
-    @locked_cached_property
+    @locked_cached_property(name='_scheme')
     def scheme(self):
         """URI scheme (http or https)."""
         return self.get_scheme()
 
-    @locked_cached_property
+    @locked_cached_property(name='_headers')
     def headers(self):
         """The request headers."""
         return self.get_headers()
 
-    @locked_cached_property
+    @locked_cached_property(name='_environ')
     def environ(self):
         """The WSGI environment used for the request data retrival."""
         return self.get_environ()

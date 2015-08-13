@@ -31,8 +31,58 @@ class TestRequest(object):
 
     def test_normal_request(self):
         initial_request = factory.post('/', data='{"hello": "world"}')
+        request = Request(initial_request)
         with pytest.raises(NotImplementedError):
-            Request(initial_request)
+            request.data
+        with pytest.raises(NotImplementedError):
+            request.method
+        with pytest.raises(NotImplementedError):
+            request.uri
+        with pytest.raises(NotImplementedError):
+            request.path
+        with pytest.raises(NotImplementedError):
+            request.args
+        with pytest.raises(NotImplementedError):
+            request.auth
+        with pytest.raises(NotImplementedError):
+            request.scheme
+        with pytest.raises(NotImplementedError):
+            request.headers
+        with pytest.raises(NotImplementedError):
+            request.environ
+
+    def test_modified_request(self):
+        MODIFIED = 'It is tricky but sometimes useful'
+
+        initial_request = factory.post('/', data='{"hello": "world"}')
+        request = Request(initial_request)
+
+        request._data = MODIFIED
+        assert request.data == MODIFIED
+
+        request._method = MODIFIED
+        assert request.method == MODIFIED
+
+        request._uri = MODIFIED
+        assert request.uri == MODIFIED
+
+        request._path = MODIFIED
+        assert request.path == MODIFIED
+
+        request._args = MODIFIED
+        assert request.args == MODIFIED
+
+        request._auth = MODIFIED
+        assert request.auth == MODIFIED
+
+        request._scheme = MODIFIED
+        assert request.scheme == MODIFIED
+
+        request._headers = MODIFIED
+        assert request.headers == MODIFIED
+
+        request._environ = MODIFIED
+        assert request.environ == MODIFIED
 
 
 class TestWerkzeugRequest(object):
