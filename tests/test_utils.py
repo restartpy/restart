@@ -2,12 +2,17 @@ from __future__ import absolute_import
 
 import os
 import sys
+import uuid
 import shutil
 import tempfile
 
 import pytest
 
-from restart.utils import load_resources, expand_wildcards
+from restart.utils import (
+    load_resources, expand_wildcards,
+    locked_cached_property, classproperty,
+    locked_cached_classproperty
+)
 
 
 def mkdir(path):
@@ -82,3 +87,63 @@ class TestUtils(object):
         assert module_names == ['testapi.resources',
                                 'testapi.resources.users',
                                 'testapi.resources.orders']
+
+    def test_locked_cached_property(self):
+        class Sample(object):
+            @locked_cached_property
+            def identifier(self):
+                return str(uuid.uuid4())
+
+        s = Sample()
+        assert s.identifier == s.identifier
+
+    def test_locked_cached_property_with_alias(self):
+        class Sample(object):
+            @locked_cached_property(name='_identifier')
+            def identifier(self):
+                return str(uuid.uuid4())
+
+        s = Sample()
+        assert s.identifier == s.identifier
+
+        s._identifier = 'foo'
+        assert s.identifier == 'foo'
+
+    def test_classproperty(self):
+        class Sample(object):
+            _name = 'sample'
+
+            @classproperty
+            def name(cls):
+                return cls._name
+
+        assert Sample.name == 'sample'
+
+        class SubSample(Sample):
+            _name = 'sub_sample'
+
+        assert SubSample.name == 'sub_sample'
+
+    def test_locked_cached_classproperty(self):
+        class Sample(object):
+            @locked_cached_classproperty
+            def static(cls):
+                return str(uuid.uuid4())
+
+            @classproperty
+            def dynamic(cls):
+                return str(uuid.uuid4())
+
+        assert Sample.static == Sample.static
+        assert Sample.dynamic != Sample.dynamic
+
+    def test_locked_cached_classproperty_with_alias(self):
+        class Sample(object):
+            @locked_cached_classproperty(name='_static')
+            def static(cls):
+                return str(uuid.uuid4())
+
+        assert Sample.static == Sample.static
+
+        Sample._static = 0
+        assert Sample.static == 0

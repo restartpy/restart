@@ -5,6 +5,7 @@ from werkzeug.utils import import_string
 from .config import config
 from .exceptions import HTTPException
 from .response import Response
+from .utils import locked_cached_classproperty
 
 
 class Resource(object):
@@ -22,14 +23,25 @@ class Resource(object):
     #: The class used for parser objects.
     renderer_class = import_string(config.RENDERER_CLASS)
 
-    #: The instances of middleware classes.
-    middlewares = tuple(
-        import_string(middleware_class)()
-        for middleware_class in config.MIDDLEWARE_CLASSES
-    )
+    #: The resource-level middleware classes
+    middleware_classes = ()
 
     def __init__(self, action_map):
         self.action_map = action_map
+
+    @locked_cached_classproperty(name='_middlewares')
+    def middlewares(cls):
+        """The instances of all middleware classes.
+
+        The final order of middleware classes:
+            The first is global middleware classes (in order) and
+            then is resource-level middleware classes (in order).
+        """
+        middleware_classes = config.MIDDLEWARE_CLASSES + cls.middleware_classes
+        return tuple(
+            import_string(middleware_class)()
+            for middleware_class in middleware_classes
+        )
 
     @property
     def logger(self):

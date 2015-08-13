@@ -70,31 +70,75 @@ def expand_wildcards(module_name):
 
 
 class locked_cached_property(object):
-    """A decorator that converts a function into a lazy property.  The
-    function wrapped is called the first time to retrieve the result
-    and then that calculated result is used the next time you access
-    the value.  Works like the one in Werkzeug but has a lock for
-    thread safety.
+    """A decorator that converts a method into a lazy property.
 
-    Borrowed from `Flask`.
+    The method wrapped is called the first time to retrieve the result
+    and then that calculated result is used the next time you access
+    the value.
+
+    This decorator has a lock for thread safety.
+
+    Inspired by `Flask`.
     """
 
     # sentinel
     _missing = object()
 
-    def __init__(self, func, name=None, doc=None):
-        self.__name__ = name or func.__name__
-        self.__module__ = func.__module__
-        self.__doc__ = doc or func.__doc__
-        self.func = func
+    def __init__(self, method=None, name=None):
+        self.name = name
         self.lock = RLock()
 
-    def __get__(self, obj, type=None):
+        if method is not None:
+            self.__call__(method)
+
+    def __call__(self, method):
+        self.method = method
+        self.name = self.name or method.__name__
+        return self
+
+    def __get__(self, obj, cls):
         if obj is None:
             return self
         with self.lock:
-            value = obj.__dict__.get(self.__name__, self._missing)
+            value = obj.__dict__.get(self.name, self._missing)
             if value is self._missing:
-                value = self.func(obj)
-                obj.__dict__[self.__name__] = value
+                value = self.method(obj)
+                obj.__dict__[self.name] = value
+            return value
+
+
+class classproperty(property):
+    """A decorator that converts a method into a read-only class property.
+
+    Note:
+        You ought not to set the value of classproperty-decorated attributes!
+        The result of the behavior is undefined.
+    """
+
+    def __init__(self, fget, *args, **kwargs):
+        super(classproperty, self).__init__(classmethod(fget),
+                                            *args, **kwargs)
+
+    def __get__(self, obj, cls):
+        return self.fget.__get__(obj, cls)()
+
+
+class locked_cached_classproperty(locked_cached_property):
+    """The lazy version of classproperty, like `locked_cached_property`.
+    """
+
+    def __init__(self, method=None, name=None):
+        super(locked_cached_classproperty, self).__init__(method, name)
+
+    def __call__(self, method):
+        self.method = classproperty(method)
+        self.name = self.name or method.__name__
+        return self
+
+    def __get__(self, obj, cls):
+        with self.lock:
+            value = cls.__dict__.get(self.name, self._missing)
+            if value is self._missing:
+                value = self.method.__get__(obj, cls)
+                setattr(cls, self.name, value)
             return value

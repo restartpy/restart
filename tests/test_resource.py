@@ -103,7 +103,7 @@ class TestResource(object):
     def test_perform_action_with_request_middlewares(self):
         # Save and change middlewares of Echo class
         initial_middlewares = Echo.middlewares
-        Echo.middlewares = (
+        Echo._middlewares = (
             RefuseRequestMiddleware(),
             AlterRequestMiddleware()
         )
@@ -118,12 +118,12 @@ class TestResource(object):
         assert response.status_code == 200
 
         # Retrieve middlewares of Echo class
-        Echo.middlewares = initial_middlewares
+        Echo._middlewares = initial_middlewares
 
     def test_perform_action_with_alter_middlewares(self):
         # Save and change middlewares of Echo class
         initial_middlewares = Echo.middlewares
-        Echo.middlewares = (
+        Echo._middlewares = (
             AlterRequestMiddleware(),
             AlterResponseMiddleware()
         )
@@ -138,7 +138,7 @@ class TestResource(object):
         assert response.status_code == 201
 
         # Retrieve middlewares of Echo class
-        Echo.middlewares = initial_middlewares
+        Echo._middlewares = initial_middlewares
 
     def test_make_response_with_data(self):
         rv = {'hello': 'world'}
