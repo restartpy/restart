@@ -1,3 +1,9 @@
+# -- Server --
+
+#: The server name (scheme + domain + port)
+SERVER_NAME = ''
+
+
 # -- Action mapping --
 
 #: The mapping from request methods to resource actions, which is
