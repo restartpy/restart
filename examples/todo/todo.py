@@ -4,6 +4,7 @@ from restart import status
 from restart.api import RESTArt
 from restart.resource import Resource
 from restart.exceptions import NotFound
+from restart.utils import make_location_header
 
 
 api = RESTArt()
@@ -26,7 +27,8 @@ class Todo(Resource):
         todo_id = max(todos.keys()) + 1
         item = dict(id=todo_id, **request.data)
         todos[todo_id] = item
-        return {'id': todo_id}, status.HTTP_201_CREATED
+        headers = {'Location': make_location_header(request, todo_id)}
+        return {'id': todo_id}, status.HTTP_201_CREATED, headers
 
     def read(self, request, todo_id):
         try:

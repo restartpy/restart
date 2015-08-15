@@ -11,7 +11,7 @@ import pytest
 from restart.utils import (
     load_resources, expand_wildcards,
     locked_cached_property, classproperty,
-    locked_cached_classproperty
+    locked_cached_classproperty, make_location_header
 )
 
 
@@ -147,3 +147,11 @@ class TestUtils(object):
 
         Sample._static = 0
         assert Sample.static == 0
+
+    def test_make_location_header(self):
+        from restart.testing import RequestFactory
+        factory = RequestFactory()
+        request = factory.post('/tests', data={})
+        assert 'http://localhost/tests/1' == make_location_header(request, 1)
+        assert ('http://localhost/tests/id' ==
+                make_location_header(request, 'id'))

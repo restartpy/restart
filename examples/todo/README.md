@@ -34,6 +34,7 @@ $ restart todo:api
     $ curl -i -X POST -H "Content-Type: application/json" -d '{"name":"eat"}' http://127.0.0.1:5000/todos
     HTTP/1.0 201 CREATED
     Content-Type: application/json
+    Location: http://127.0.0.1:5000/todos/3
     Content-Length: 9
     Server: Werkzeug/0.10.4 Python/2.7.3
     Date: Sun, 17 May 2015 04:36:48 GMT

@@ -142,3 +142,12 @@ class locked_cached_classproperty(locked_cached_property):
                 value = self.method.__get__(obj, cls)
                 setattr(cls, self.name, value)
             return value
+
+
+def make_location_header(request, pk):
+    """Make the Location header for the newly-created resource.
+
+    :param request: the POST request object.
+    :param pk: the primary key of the resource.
+    """
+    return '%s/%s' % (request.uri.rstrip('/'), pk)
