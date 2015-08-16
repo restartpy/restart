@@ -3,7 +3,8 @@ from __future__ import absolute_import
 import pytest
 
 from restart.request import Request, WerkzeugRequest
-from restart.parser import JSONParser
+from restart.parsers import JSONParser
+from restart.negotiator import Negotiator
 from restart.testing import RequestFactory
 
 
@@ -32,8 +33,14 @@ class TestRequest(object):
     def test_normal_request(self):
         initial_request = factory.post('/', data='{"hello": "world"}')
         request = Request(initial_request)
+        assert request.data == {}
+
         with pytest.raises(NotImplementedError):
-            request.data
+            request.content_type
+        with pytest.raises(NotImplementedError):
+            request.content_length
+        with pytest.raises(NotImplementedError):
+            request.stream
         with pytest.raises(NotImplementedError):
             request.method
         with pytest.raises(NotImplementedError):
@@ -94,7 +101,8 @@ class TestWerkzeugRequest(object):
         request = WerkzeugRequest(initial_request)
         assert (str(request) ==
                 "<WerkzeugRequest [POST 'http://localhost/sample?x=1&y=2']>")
-        assert request.data == '{"hello": "world"}'
+        assert request.data == {}
+        assert request.stream.read() == '{"hello": "world"}'
         assert request.method == 'POST'
         assert request.uri == 'http://localhost/sample?x=1&y=2'
         assert request.path == '/sample'
@@ -106,16 +114,21 @@ class TestWerkzeugRequest(object):
         assert_environ(request.environ)
 
     def test_parsed_request(self):
-        initial_request = factory.post('/sample?x=1&y=2',
-                                       data='{"hello": "world"}')
+        initial_request = factory.post(
+            '/sample?x=1&y=2',
+            data='{"hello": "world"}',
+            content_type='application/json'
+        )
         request = WerkzeugRequest(initial_request)
-        parsed_request = request.parse(JSONParser)
+        parsed_request = request.parse(Negotiator, [JSONParser])
         assert parsed_request.data == {'hello': 'world'}
+        assert request.stream.read() == ''
 
     def test_normal_request_with_empty_data(self):
         initial_request = factory.get('/')
         request = WerkzeugRequest(initial_request)
-        assert request.data == ''
+        assert request.data == {}
+        assert request.stream.read() == ''
         assert request.method == 'GET'
         assert request.uri == 'http://localhost/'
         assert request.path == '/'
@@ -124,9 +137,3 @@ class TestWerkzeugRequest(object):
         assert request.scheme == 'http'
         assert request.headers['Host'] == 'localhost'
         assert_environ(request.environ)
-
-    def test_parsed_request_with_empty_data(self):
-        initial_request = factory.get('/')
-        request = WerkzeugRequest(initial_request)
-        parsed_request = request.parse(JSONParser)
-        assert parsed_request.data == {}

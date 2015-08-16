@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from werkzeug.wsgi import get_content_length
+
 from .utils import locked_cached_property
 
 
@@ -12,20 +14,33 @@ class Request(object):
     def __init__(self, initial_request):
         self.initial_request = initial_request
 
-    def parse(self, parser_class):
+    def parse(self, negotiator_class, parser_classes):
         """Return a request object with the data parsed, which is a
-        dictionary. If the request data is empty, the parsed data
+        dictionary. If the request payload is empty, the parsed data
         will be an empty dictionary.
 
-        :param parser_class: the parser class used to parse the request data.
-                             See :ref:`parser-objects` for information about
-                             parsers.
+        :param negotiator_class: the negotiator class used to select
+                                 the proper parser, which will be used
+                                 to parse the request payload.
+        :param parser_classes: the parser classes to select from.
+                               See :ref:`parser-objects` for information
+                               about parsers.
         """
-        parser = parser_class()
-        if not self.data:
-            self._data = {}
-        else:
-            self._data = parser.parse(self.data)
+        if self.content_length:
+            negotiator = negotiator_class()
+            parser_class = negotiator.select_parser(
+                self.content_type, parser_classes
+            )
+            parser = parser_class()
+            result = parser.parse(self.stream, self.content_type,
+                                  self.content_length)
+            if isinstance(result, tuple):
+                assert len(result) == 2, \
+                        'Expected a two-tuple of (data, files)'
+                self._data, self._files = result
+            else:
+                self._data = result
+                self._files = {}
         return self
 
     def __str__(self):
@@ -34,10 +49,30 @@ class Request(object):
 
     __repr__ = __str__
 
+    @locked_cached_property
+    def content_type(self):
+        """The content type of the request payload."""
+        return self.environ.get('CONTENT_TYPE')
+
+    @locked_cached_property
+    def content_length(self):
+        """The content length of the request payload."""
+        return get_content_length(self.environ)
+
     @locked_cached_property(name='_data')
     def data(self):
-        """The request payload."""
-        return self.get_data()
+        """The parsed request payload."""
+        return {}
+
+    @locked_cached_property(name='_files')
+    def files(self):
+        """The uploaded request files."""
+        return {}
+
+    @locked_cached_property(name='_stream')
+    def stream(self):
+        """The request stream (a file-like object)."""
+        return self.get_stream()
 
     @locked_cached_property(name='_method')
     def method(self):
@@ -81,8 +116,8 @@ class Request(object):
         """The WSGI environment used for the request data retrival."""
         return self.get_environ()
 
-    def get_data(self):
-        """Get the request data."""
+    def get_stream(self):
+        """Get the request stream."""
         raise NotImplementedError()
 
     def get_method(self):
@@ -121,11 +156,11 @@ class Request(object):
 class WerkzeugRequest(Request):
     """The Werkzeug-specific request class."""
 
-    def get_data(self):
-        """Get the request data from the Werkzeug-specific
+    def get_stream(self):
+        """Get the request stream from the Werkzeug-specific
         request object.
         """
-        return self.initial_request.data
+        return self.initial_request.stream
 
     def get_method(self):
         """Get the request method from the Werkzeug-specific

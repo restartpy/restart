@@ -16,14 +16,18 @@ ACTION_MAP = {
     'DELETE': 'delete',
     'OPTIONS': 'options',
     'HEAD': 'head',
-    'TRACE': 'trace',
+    'TRACE': 'trace'
 }
 
 
 # -- Parser and Renderer --
 
-#: The default Parser class.
-PARSER_CLASS = 'restart.parser.JSONParser'
+#: The default Parser classes.
+PARSER_CLASSES = (
+    'restart.parsers.JSONParser',
+    'restart.parsers.URLEncodedParser',
+    'restart.parsers.MultiPartParser'
+)
 
 #: The default Renderer class.
 RENDERER_CLASS = 'restart.renderer.JSONRenderer'

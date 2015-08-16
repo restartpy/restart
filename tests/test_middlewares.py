@@ -103,13 +103,13 @@ class TestCORSMiddleware(object):
         config.CORS_ALLOW_CREDENTIALS = initial_cors_allow_credentials
 
     def test_actual_request(self):
-        data = '"hello"'
+        data = {'hello': 'world'}
         request = factory.get('/', data=data)
         resource = self.make_resource()
         response = resource.dispatch_request(request)
 
         assert isinstance(response, Response)
-        assert response.data == data
+        assert response.data == '{"hello": "world"}'
         assert response.status_code == 200
         assert response.headers['Access-Control-Allow-Origin'] == '*'
         assert 'Access-Control-Allow-Credentials' not in response.headers
@@ -122,13 +122,13 @@ class TestCORSMiddleware(object):
         config.CORS_ALLOW_ORIGIN = 'http://localhost'
         config.CORS_ALLOW_CREDENTIALS = True
 
-        data = '"hello"'
+        data = {'hello': 'world'}
         request = factory.get('/', data=data)
         resource = self.make_resource()
         response = resource.dispatch_request(request)
 
         assert isinstance(response, Response)
-        assert response.data == data
+        assert response.data == '{"hello": "world"}'
         assert response.status_code == 200
         assert (response.headers['Access-Control-Allow-Origin'] ==
                 'http://localhost')

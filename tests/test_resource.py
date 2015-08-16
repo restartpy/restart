@@ -21,7 +21,7 @@ class RefuseRequestMiddleware(object):
 class AlterRequestMiddleware(object):
 
     def process_request(self, request):
-        request.data += ' (altered)'
+        request.data.update({'tag': 'altered'})
 
 
 class AlterResponseMiddleware(object):
@@ -48,17 +48,17 @@ class TestResource(object):
         return Echo(action_map)
 
     def test_dispatch_request(self):
-        data = '"hello"'
+        data = {'hello': 'world'}
         request = factory.get('/', data=data)
         resource = self.make_resource()
         response = resource.dispatch_request(request)
 
         assert isinstance(response, Response)
-        assert response.data == data
+        assert response.data == '{"hello": "world"}'
         assert response.status_code == 200
 
     def test_dispatch_request_with_invalid_action_map(self):
-        data = '"hello"'
+        data = {'hello': 'world'}
         request = factory.get('/', data=data)
         resource = self.make_resource(action_map={'POST': 'create'})
 
@@ -68,7 +68,7 @@ class TestResource(object):
         assert str(exc.value) == repr(expected_exc_msg)
 
     def test_dispatch_request_with_unimplemented_action(self):
-        data = '"hello"'
+        data = {'hello': 'world'}
         request = factory.patch('/', data=data)
         resource = self.make_resource()
 
@@ -78,7 +78,7 @@ class TestResource(object):
         assert str(exc.value) == expected_exc_msg
 
     def test_dispatch_request_with_action_exception(self):
-        data = '"hello"'
+        data = {'hello': 'world'}
         request = factory.post('/', data=data)
         resource = self.make_resource()
 
@@ -108,7 +108,7 @@ class TestResource(object):
             AlterRequestMiddleware()
         )
 
-        data = '"hello"'
+        data = {'hello': 'world'}
         request = factory.get('/', data=data)
         resource = self.make_resource()
         response = resource.dispatch_request(request)
@@ -128,13 +128,13 @@ class TestResource(object):
             AlterResponseMiddleware()
         )
 
-        data = '"hello"'
+        data = {'hello': 'world'}
         request = factory.get('/', data=data)
         resource = self.make_resource()
         response = resource.dispatch_request(request)
 
         assert isinstance(response, Response)
-        assert response.data == '"hello (altered)"'
+        assert 'tag' in response.data
         assert response.status_code == 201
 
         # Retrieve middlewares of Echo class

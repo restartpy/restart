@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from werkzeug.utils import import_string
 
 from .config import config
+from .negotiator import Negotiator
 from .exceptions import HTTPException
 from .response import Response
 from .utils import locked_cached_classproperty
@@ -18,10 +19,16 @@ class Resource(object):
     name = None
 
     #: The class used for parser objects.
-    parser_class = import_string(config.PARSER_CLASS)
+    parser_classes = tuple(
+        import_string(parser_class)
+        for parser_class in config.PARSER_CLASSES
+    )
 
     #: The class used for parser objects.
     renderer_class = import_string(config.RENDERER_CLASS)
+
+    #: The class used to select the proper parser or renderer
+    negotiator_class = Negotiator
 
     #: The resource-level middleware classes
     middleware_classes = ()
@@ -80,7 +87,8 @@ class Resource(object):
         :param args: the positional arguments captured from the URI.
         :param kwargs: the keyword arguments captured from the URI.
         """
-        self.request = request.parse(self.parser_class)
+        self.request = request.parse(self.negotiator_class,
+                                     self.parser_classes)
         self.log_message('<Request> %s' % request.data)
 
         try:

@@ -83,7 +83,7 @@ class TestRequestFactory(object):
         assert isinstance(request, request_class)
         assert request.method == method
         assert request.path == path
-        assert request.data == data
+        assert request.stream.read() == data
         assert request.args == args
 
     def test_get_cases(self):
