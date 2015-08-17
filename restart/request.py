@@ -14,22 +14,21 @@ class Request(object):
     def __init__(self, initial_request):
         self.initial_request = initial_request
 
-    def parse(self, negotiator_class, parser_classes):
+    def parse(self, negotiator, parser_classes):
         """Return a request object with the data parsed, which is a
         dictionary. If the request payload is empty, the parsed data
         will be an empty dictionary.
 
-        :param negotiator_class: the negotiator class used to select
-                                 the proper parser, which will be used
-                                 to parse the request payload.
+        :param negotiator: the negotiator object used to select
+                           the proper parser, which will be used
+                           to parse the request payload.
         :param parser_classes: the parser classes to select from.
-                               See :ref:`parser-objects` for information
-                               about parsers.
+                               See :ref:`parser-objects` for
+                               information about parsers.
         """
         if self.content_length:
-            negotiator = negotiator_class()
             parser_class = negotiator.select_parser(
-                self.content_type, parser_classes
+                parser_classes, self.content_type
             )
             parser = parser_class()
             result = parser.parse(self.stream, self.content_type,

@@ -4,7 +4,8 @@ import pytest
 from werkzeug.wrappers import Response as WerkzeugSpecificResponse
 
 from restart.response import Response, WerkzeugResponse
-from restart.renderer import JSONRenderer
+from restart.renderers import JSONRenderer
+from restart.negotiator import Negotiator
 
 
 class TestResponse(object):
@@ -18,7 +19,9 @@ class TestResponse(object):
 
     def test_rendered_response(self):
         response = Response({'hello': 'world'})
-        rendered_response = response.render(JSONRenderer)
+        rendered_response = response.render(
+            Negotiator(), (JSONRenderer,), 'json'
+        )
 
         assert rendered_response.data == '{"hello": "world"}'
 
@@ -33,7 +36,9 @@ class TestWerkzeugResponse(object):
 
     def test_specific_rendered_response(self):
         response = WerkzeugResponse({'hello': 'world'})
-        rendered_response = response.render(JSONRenderer)
+        rendered_response = response.render(
+            Negotiator(), (JSONRenderer,), 'json'
+        )
         specific_response = rendered_response.get_specific_response()
 
         assert isinstance(specific_response, WerkzeugSpecificResponse)

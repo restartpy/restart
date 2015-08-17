@@ -26,11 +26,13 @@ ACTION_MAP = {
 PARSER_CLASSES = (
     'restart.parsers.JSONParser',
     'restart.parsers.URLEncodedParser',
-    'restart.parsers.MultiPartParser'
+    'restart.parsers.MultiPartParser',
 )
 
-#: The default Renderer class.
-RENDERER_CLASS = 'restart.renderer.JSONRenderer'
+#: The default Renderer classes.
+RENDERER_CLASSES = (
+    'restart.renderers.JSONRenderer',
+)
 
 
 # -- Logger --

@@ -18,14 +18,17 @@ class Resource(object):
     #: The name of the resource.
     name = None
 
-    #: The class used for parser objects.
+    #: The parser classes used for parsing request data.
     parser_classes = tuple(
         import_string(parser_class)
         for parser_class in config.PARSER_CLASSES
     )
 
-    #: The class used for parser objects.
-    renderer_class = import_string(config.RENDERER_CLASS)
+    #: The renderer classes used for rendering response data.
+    renderer_classes = tuple(
+        import_string(renderer_class)
+        for renderer_class in config.RENDERER_CLASSES
+    )
 
     #: The class used to select the proper parser or renderer
     negotiator_class = Negotiator
@@ -87,8 +90,10 @@ class Resource(object):
         :param args: the positional arguments captured from the URI.
         :param kwargs: the keyword arguments captured from the URI.
         """
-        self.request = request.parse(self.negotiator_class,
-                                     self.parser_classes)
+        negotiator = self.negotiator_class()
+        self.format_suffix = kwargs.pop('format', None)
+
+        self.request = request.parse(negotiator, self.parser_classes)
         self.log_message('<Request> %s' % request.data)
 
         try:
@@ -99,7 +104,8 @@ class Resource(object):
         response = self.make_response(rv)
         self.log_message('<Response> %s %s' % (response.status, response.data))
 
-        return response.render(self.renderer_class)
+        return response.render(negotiator, self.renderer_classes,
+                               self.format_suffix)
 
     def find_action(self, request):
         """Find the appropriate action according to the request method.

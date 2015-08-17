@@ -2,18 +2,18 @@ from __future__ import absolute_import
 
 import pytest
 
-from restart.renderer import Renderer, JSONRenderer
+from restart.renderers import Renderer, JSONRenderer
 
 
-class TestParser(object):
+class TestRenderers(object):
 
-    def test_parser(self):
+    def test_renderer(self):
         renderer = Renderer()
 
         with pytest.raises(NotImplementedError):
             renderer.render({'hello': 'world'})
 
-    def test_json_parser(self):
+    def test_json_renderer(self):
         renderer = JSONRenderer()
         rendered = renderer.render({'hello': 'world'})
 

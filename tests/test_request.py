@@ -120,7 +120,7 @@ class TestWerkzeugRequest(object):
             content_type='application/json'
         )
         request = WerkzeugRequest(initial_request)
-        parsed_request = request.parse(Negotiator, [JSONParser])
+        parsed_request = request.parse(Negotiator(), [JSONParser])
         assert parsed_request.data == {'hello': 'world'}
         assert request.stream.read() == ''
 

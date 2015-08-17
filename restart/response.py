@@ -26,13 +26,20 @@ class Response(object):
             _status = '%d UNKNOWN' % code
         return _status
 
-    def render(self, renderer_class):
+    def render(self, negotiator, renderer_classes, format_suffix):
         """Return a response object with the data rendered.
 
-        :param renderer_class: the renderer class used to render the
-                               response data. See :ref:`renderer-objects`
-                               for information about renderers.
+        :param negotiator: the negotiator object used to select
+                           the proper renderer, which will be used
+                           to render the response payload.
+        :param renderer_classes: the renderer classes to select from.
+                               See :ref:`renderer-objects` for
+                               information about renderers.
+        :param format_suffix: the format suffix of the request uri.
         """
+        renderer_class = negotiator.select_renderer(
+            renderer_classes, format_suffix
+        )
         renderer = renderer_class()
         self.data = renderer.render(self.data)
         self.headers.update({'Content-Type': renderer.content_type})

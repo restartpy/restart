@@ -9,6 +9,9 @@ class Renderer(object):
     #: The content type bound to this renderer.
     content_type = None
 
+    #: The format suffix bound to this renderer.
+    format_suffix = None
+
     def render(self, data):
         """Render `data`.
 
@@ -22,6 +25,9 @@ class JSONRenderer(Renderer):
 
     #: The content type bound to this renderer.
     content_type = 'application/json'
+
+    #: The format suffix bound to this renderer.
+    format_suffix = 'json'
 
     def render(self, data):
         """Render `data` into JSON.
