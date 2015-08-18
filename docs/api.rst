@@ -56,12 +56,18 @@ Response Objects
 Parser Objects
 --------------
 
-.. module:: restart.parser
+.. module:: restart.parsers
 
 .. autoclass:: Parser
    :members:
 
 .. autoclass:: JSONParser
+   :members:
+
+.. autoclass:: MultiPartParser
+   :members:
+
+.. autoclass:: URLEncodedParser
    :members:
 
 
@@ -70,7 +76,7 @@ Parser Objects
 Renderer  Objects
 -----------------
 
-.. module:: restart.renderer
+.. module:: restart.renderers
 
 .. autoclass:: Renderer
    :members:

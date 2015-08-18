@@ -12,6 +12,16 @@ Options
 .. module:: restart.config.default
 
 
+Server
+^^^^^^
+
+===========  ===============================  ========================================
+Option name  Default value                    Description
+===========  ===============================  ========================================
+SERVER_NAME  .. autodata_value:: SERVER_NAME  The server name (scheme + domain + port)
+===========  ===============================  ========================================
+
+
 Action mapping
 ^^^^^^^^^^^^^^
 
@@ -25,15 +35,15 @@ ACTION_MAP   .. autodata_value:: ACTION_MAP  The mapping from request methods
 ===========  ==============================  ==================================
 
 
-Parser and Renderer
-^^^^^^^^^^^^^^^^^^^
+Parsers and Renderers
+^^^^^^^^^^^^^^^^^^^^^
 
-==============  ==================================  ===========================
-Option name     Default value                       Description
-==============  ==================================  ===========================
-PARSER_CLASS    .. autodata_value:: PARSER_CLASS    The default Parser class.
-RENDERER_CLASS  .. autodata_value:: RENDERER_CLASS  The default Renderer class.
-==============  ==================================  ===========================
+================  ====================================  =============================
+Option name       Default value                         Description
+================  ====================================  =============================
+PARSER_CLASSES    .. autodata_value:: PARSER_CLASSES    The default Parser classes.
+RENDERER_CLASSES  .. autodata_value:: RENDERER_CLASSES  The default Renderer classes.
+================  ====================================  =============================
 
 
 Logger
