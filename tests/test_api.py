@@ -36,6 +36,46 @@ class TestAPI(object):
         with pytest.raises(AssertionError):
             api.add_rule(Dummy, '/dummy', 'dummy')
 
+    def test_add_rule_with_invalid_format_suffix(self):
+        class Dummy(Resource):
+            name = 'dummy'
+
+        api = RESTArt()
+        with pytest.raises(AssertionError) as exc:
+            api.add_rule_with_format_suffix(Dummy, '/dummy', 'dummy',
+                                            format_suffix='enabled')
+        assert str(exc.value) == ("`format_suffix` must be one of "
+                                  "('disabled', 'optional', 'mandatory')")
+
+    def test_add_rule_with_optional_format_suffix(self):
+        class Dummy(Resource):
+            name = 'dummy'
+
+        api = RESTArt()
+        api.add_rule_with_format_suffix(Dummy, '/dummy', 'dummy',
+                                        format_suffix='optional')
+        assert 'dummy' in api.rules
+        rule = api.rules['dummy']
+        self.assert_rule(rule, ('/dummy', config.ACTION_MAP.keys(), Dummy))
+
+        assert 'dummy_format' in api.rules
+        rule = api.rules['dummy_format']
+        self.assert_rule(rule, ('/dummy.<format>', config.ACTION_MAP.keys(),
+                                Dummy))
+
+    def test_add_rule_with_mandatory_format_suffix(self):
+        class Dummy(Resource):
+            name = 'dummy'
+
+        api = RESTArt()
+        api.add_rule_with_format_suffix(Dummy, '/dummy', 'dummy',
+                                        format_suffix='mandatory')
+        assert 'dummy' not in api.rules
+        assert 'dummy_format' in api.rules
+        rule = api.rules['dummy_format']
+        self.assert_rule(rule, ('/dummy.<format>', config.ACTION_MAP.keys(),
+                                Dummy))
+
     def test_route(self):
         api = RESTArt()
 
