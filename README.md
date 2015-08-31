@@ -5,7 +5,17 @@ A Python library with good intentions for building REST APIs.
 
 ## Philosophy
 
-`RESTArt` try to help you build your Web APIs by following **the Art of REST**.
+1. Elegant
+
+    `RESTArt` follows the art of [Flask][1]. It tries to help you build REST APIs by writing simple, clean and Pythonic code.
+
+2. Light
+
+    Only the essentials for REST APIs are included, no assumptions are made for you. The frameworks, databases and the business logic are all up to you.
+
+3. Flexible
+
+    Customizations and extensions are made easy. The limit is your imagination!
 
 
 ## RESTArt is Simple
@@ -46,13 +56,14 @@ $ curl http://127.0.0.1:5000/greeting
 
 ## Documentation
 
-Check out the [documentation][1].
+Check out the [documentation][2].
 
 
 ## License
 
-[MIT][2]
+[MIT][3]
 
 
-[1]: https://restart.readthedocs.org
-[2]: http://opensource.org/licenses/MIT
+[1]: http://flask.pocoo.org/
+[2]: https://restart.readthedocs.org
+[3]: http://opensource.org/licenses/MIT
