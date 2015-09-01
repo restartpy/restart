@@ -51,8 +51,6 @@ Response Objects
    :members:
 
 
-.. _negotiator-objects:
-
 Negotiator Object
 -----------------
 

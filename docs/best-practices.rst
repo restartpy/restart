@@ -28,7 +28,7 @@ Here’s an example directory structure::
                     resource.py
         tests/                   # optional, contains the test code
 
-See `examples/trello`_ for details.
+See `examples/blog`_ for details.
 
 
-.. _examples/trello: https://github.com/RussellLuo/restart/tree/master/examples/trello
+.. _examples/blog: https://github.com/RussellLuo/restart/tree/master/examples/blog
