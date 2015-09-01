@@ -51,6 +51,17 @@ Response Objects
    :members:
 
 
+.. _negotiator-objects:
+
+Negotiator Object
+-----------------
+
+.. module:: restart.negotiator
+
+.. autoclass:: Negotiator
+   :members:
+
+
 .. _parser-objects:
 
 Parser Objects

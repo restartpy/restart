@@ -22,8 +22,12 @@ As a concrete example, consider the following ``Greeting`` API::
             return {'hello': 'world'}
 
 
+Development
+-----------
+
+
 The Pythonic Way
-----------------
+^^^^^^^^^^^^^^^^
 
 As a Pythonista, chances are you like to run the API just as a normal Python script. That's good!
 
@@ -45,7 +49,7 @@ Now, you can run the API like this::
 
 
 The Command Line Utility
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 To make the serving step as simple as possible, RESTArt also provides a command line utility called ``restart``. You may have seen it in :ref:`quickstart`. Yes! It's born for serving, and you will not be disappointed to use it::
 
@@ -67,3 +71,39 @@ entrypoint       helloworld:api  A string in the form ``module_path:api``
 For the options supported by ``reatart``, see the help messages::
 
     $ restart --help
+
+
+Deployment
+----------
+
+RESTArt's primary deployment platform is `WSGI`_, the Python standard for web servers and applications.
+
+To make RESTArt APIs easy to deploy, it's recommended to create a file named `wsgi.py` as follows::
+
+    # wsgi.py
+
+    from restart.serving import Service
+    from helloworld import api
+
+    application = Service(api)
+
+Then use awesome WSGI servers to communicate with the `application` callable.
+
+
+Gunicorn
+^^^^^^^^
+
+`Gunicorn`_ (‘Green Unicorn’) is a pure-Python WSGI server for UNIX. It has no dependencies and is easy to install and use.
+
+
+1. Install Gunicorn::
+
+    $ pip install gunicorn
+
+2. Use Gunicorn::
+
+    $ gunicorn wsgi -b 127.0.0.1:5000
+
+
+.. _WSGI: http://www.wsgi.org/
+.. _Gunicorn: http://gunicorn.org/
