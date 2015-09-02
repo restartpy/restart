@@ -30,3 +30,14 @@ If you are looking for information on a specific function, class or method, this
    :maxdepth: 2
 
    api
+
+
+Additional Notes
+----------------
+
+Design notes and changelog are here for the interested.
+
+.. toctree::
+   :maxdepth: 2
+
+   changelog
