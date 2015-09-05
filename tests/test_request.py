@@ -102,7 +102,7 @@ class TestWerkzeugRequest(object):
         assert (str(request) ==
                 "<WerkzeugRequest [POST 'http://localhost/sample?x=1&y=2']>")
         assert request.data == {}
-        assert request.stream.read() == '{"hello": "world"}'
+        assert request.stream.read() == b'{"hello": "world"}'
         assert request.method == 'POST'
         assert request.uri == 'http://localhost/sample?x=1&y=2'
         assert request.path == '/sample'
@@ -122,13 +122,13 @@ class TestWerkzeugRequest(object):
         request = WerkzeugRequest(initial_request)
         parsed_request = request.parse(Negotiator(), [JSONParser])
         assert parsed_request.data == {'hello': 'world'}
-        assert request.stream.read() == ''
+        assert request.stream.read() == b''
 
     def test_normal_request_with_empty_data(self):
         initial_request = factory.get('/')
         request = WerkzeugRequest(initial_request)
         assert request.data == {}
-        assert request.stream.read() == ''
+        assert request.stream.read() == b''
         assert request.method == 'GET'
         assert request.uri == 'http://localhost/'
         assert request.path == '/'

@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import functools
 
+from six import iteritems
 from werkzeug.routing import Map as WerkzeugMap, Rule as WerkzeugRule
 
 from .api import Rule
@@ -45,7 +46,7 @@ class Adapter(object):
 
         adapted_rules = {
             endpoint: Rule(rule.uri, rule.methods, decorator(rule.handler))
-            for endpoint, rule in rules.iteritems()
+            for endpoint, rule in iteritems(rules)
         }
         return adapted_rules
 
@@ -68,6 +69,6 @@ class WerkzeugAdapter(Adapter):
     def final_rules(self):
         rule_map = WerkzeugMap([
             WerkzeugRule(rule.uri, endpoint=endpoint, methods=rule.methods)
-            for endpoint, rule in self.adapted_rules.iteritems()
+            for endpoint, rule in iteritems(self.adapted_rules)
         ])
         return rule_map

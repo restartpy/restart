@@ -4,6 +4,7 @@ import os
 import sys
 import shutil
 import tempfile
+import six
 
 
 def mkdir(path):
@@ -66,4 +67,7 @@ class TestUtils(object):
     def test_restart_ext_package_import_inner_module(self):
         from restart.ext.package import module
         assert module.mod_id == 'restart_package_module'
-        assert module.__name__ == 'restart_package.module'
+        if six.PY2:
+            assert module.__name__ == 'restart_package.module'
+        else:
+            assert module.__name__ == 'restart.ext.package.module'

@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import pytest
-from cStringIO import StringIO
+from io import BytesIO
 
 from werkzeug.datastructures import FileStorage
 from restart.parsers import (
@@ -40,14 +40,14 @@ class TestParsers(object):
         parser = MultiPartParser()
         data = {
             'text': 'this is some text',
-            'file': (StringIO('this is the file'), 'test.txt')
+            'file': (BytesIO(b'this is the file'), 'test.txt')
         }
         parsed_data, parsed_files = self.parse(parser, data)
 
         assert parsed_data['text'] == 'this is some text'
         assert isinstance(parsed_files['file'], FileStorage)
         assert parsed_files['file'].filename == 'test.txt'
-        assert parsed_files['file'].stream.read() == 'this is the file'
+        assert parsed_files['file'].stream.read() == b'this is the file'
 
     def test_urlencoded_parser(self):
         parser = URLEncodedParser()

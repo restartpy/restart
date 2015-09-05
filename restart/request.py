@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from six import iteritems
 from werkzeug.wsgi import get_content_length
 
 from .utils import locked_cached_property
@@ -185,7 +186,7 @@ class WerkzeugRequest(Request):
         """
         args = {
             k: v if len(v) > 1 else v[0]
-            for k, v in self.initial_request.args.iterlists()
+            for k, v in iteritems(self.initial_request.args)
         }
         return args
 

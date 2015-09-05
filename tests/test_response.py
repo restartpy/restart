@@ -43,7 +43,7 @@ class TestWerkzeugResponse(object):
 
         assert isinstance(specific_response, WerkzeugSpecificResponse)
         assert str(response) == '<WerkzeugResponse [200 OK]>'
-        assert specific_response.data == '{"hello": "world"}'
+        assert specific_response.data == b'{"hello": "world"}'
         assert specific_response.status_code == 200
         assert specific_response.status == '200 OK'
         assert specific_response.headers['Content-Type'] == 'application/json'

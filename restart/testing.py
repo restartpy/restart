@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from six import iteritems
 from werkzeug.test import Client as WerkzeugClient, EnvironBuilder
 from werkzeug.wrappers import Request as WerkzeugSpecificRequest
 
@@ -29,9 +30,9 @@ class Client(WerkzeugClient):
 
     def wrap_response(self, response):
         _data, _status, _headers = response
-        data = u''.join(_data)
+        data = b''.join(_data)
         status_code = int(_status.split(None, 1)[0])
-        headers = {key: value for key, value in _headers.items()}
+        headers = {key: value for key, value in iteritems(_headers)}
         return Response(data, status_code, headers)
 
     def open(self, *args, **kwargs):

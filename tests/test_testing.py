@@ -42,32 +42,32 @@ class TestClient(object):
 
     def test_get_cases(self):
         response = self.client.get('/cases')
-        assert response.data == '[{"name": "case_1"}]'
+        assert response.data == b'[{"name": "case_1"}]'
         assert response.status_code == 200
 
     def test_post_cases(self):
         response = self.client.post('/cases')
-        assert response.data == '""'
+        assert response.data == b'""'
         assert response.status_code == 201
 
     def test_get_case(self):
         response = self.client.get('/cases/1')
-        assert response.data == '{"name": "case_1"}'
+        assert response.data == b'{"name": "case_1"}'
         assert response.status_code == 200
 
     def test_put_case(self):
         response = self.client.put('/cases/1')
-        assert response.data == ''
+        assert response.data == b''
         assert response.status_code == 204
 
     def test_patch_case(self):
         response = self.client.patch('/cases/1')
-        assert response.data == ''
+        assert response.data == b''
         assert response.status_code == 204
 
     def test_delete_case(self):
         response = self.client.delete('/cases/1')
-        assert response.data == ''
+        assert response.data == b''
         assert response.status_code == 204
 
 
@@ -89,53 +89,53 @@ class TestRequestFactory(object):
     def test_get_cases(self):
         request = self.initial_factory.get('/cases')
         self.assert_request(request, WerkzeugSpecificRequest,
-                            'GET', '/cases', '')
+                            'GET', '/cases', b'')
 
         request = self.factory.get('/cases')
         self.assert_request(request, WerkzeugRequest,
-                            'GET', '/cases', '')
+                            'GET', '/cases', b'')
 
     def test_post_cases(self):
         request = self.initial_factory.post('/cases', data='{"name": "case"}')
         self.assert_request(request, WerkzeugSpecificRequest,
-                            'POST', '/cases', '{"name": "case"}')
+                            'POST', '/cases', b'{"name": "case"}')
 
         request = self.factory.post('/cases', data='{"name": "case_2"}')
         self.assert_request(request, WerkzeugRequest,
-                            'POST', '/cases', '{"name": "case_2"}')
+                            'POST', '/cases', b'{"name": "case_2"}')
 
     def test_get_case(self):
         request = self.initial_factory.get('/cases/1')
         self.assert_request(request, WerkzeugSpecificRequest,
-                            'GET', '/cases/1', '')
+                            'GET', '/cases/1', b'')
 
         request = self.factory.get('/cases/1')
         self.assert_request(request, WerkzeugRequest,
-                            'GET', '/cases/1', '')
+                            'GET', '/cases/1', b'')
 
     def test_put_case(self):
         request = self.initial_factory.put('/cases/1')
         self.assert_request(request, WerkzeugSpecificRequest,
-                            'PUT', '/cases/1', '')
+                            'PUT', '/cases/1', b'')
 
         request = self.factory.put('/cases/1')
         self.assert_request(request, WerkzeugRequest,
-                            'PUT', '/cases/1', '')
+                            'PUT', '/cases/1', b'')
 
     def test_patch_case(self):
         request = self.initial_factory.patch('/cases/1')
         self.assert_request(request, WerkzeugSpecificRequest,
-                            'PATCH', '/cases/1', '')
+                            'PATCH', '/cases/1', b'')
 
         request = self.factory.patch('/cases/1')
         self.assert_request(request, WerkzeugRequest,
-                            'PATCH', '/cases/1', '')
+                            'PATCH', '/cases/1', b'')
 
     def test_delete_case(self):
         request = self.initial_factory.delete('/cases/1')
         self.assert_request(request, WerkzeugSpecificRequest,
-                            'DELETE', '/cases/1', '')
+                            'DELETE', '/cases/1', b'')
 
         request = self.factory.delete('/cases/1')
         self.assert_request(request, WerkzeugRequest,
-                            'DELETE', '/cases/1', '')
+                            'DELETE', '/cases/1', b'')

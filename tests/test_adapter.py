@@ -26,7 +26,7 @@ class TestAdapter(object):
         adapted_rules = adapter.adapted_rules
 
         assert len(adapted_rules) == 1
-        endpoint = adapted_rules.keys()[0]
+        endpoint = list(adapted_rules.keys())[0]
         assert endpoint == 'demo'
 
         rule = adapted_rules[endpoint]
