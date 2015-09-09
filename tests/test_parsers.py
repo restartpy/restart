@@ -8,6 +8,7 @@ from restart.parsers import (
     Parser, JSONParser,
     MultiPartParser, URLEncodedParser
 )
+from restart.exceptions import BadRequest
 from restart.testing import RequestFactory
 
 
@@ -35,6 +36,13 @@ class TestParsers(object):
         parsed = self.parse(parser, data, 'application/json')
 
         assert parsed == {'hello': 'world'}
+
+    def test_json_parser_with_invalid_data(self):
+        parser = JSONParser()
+        data = {'hello': 'world'}
+
+        with pytest.raises(BadRequest):
+            self.parse(parser, data, 'application/json')
 
     def test_multi_part_parser(self):
         parser = MultiPartParser()
