@@ -203,7 +203,7 @@ class Resource(object):
             return rv
         else:
             self.log_exception(exc)
-            raise exc
+            raise
 
     def make_response(self, rv):
         """Converts the return value to a real response object that is
