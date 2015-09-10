@@ -4,8 +4,8 @@ from werkzeug.utils import import_string
 
 from .config import config
 from .negotiator import Negotiator
-from .exceptions import HTTPException
 from .response import Response
+from . import exceptions
 from .utils import locked_cached_classproperty
 
 
@@ -107,6 +107,14 @@ class Resource(object):
         return response.render(negotiator, self.renderer_classes,
                                self.format_suffix)
 
+    def http_method_not_allowed(self, request, *args, **kwargs):
+        """The default action handler if the corresponding action for
+        `request.method` is not implemented.
+
+        See :meth:`dispatch_request` for the meanings of the parameters.
+        """
+        raise exceptions.MethodNotAllowed()
+
     def find_action(self, request):
         """Find the appropriate action according to the request method.
 
@@ -120,12 +128,7 @@ class Resource(object):
             )
             raise
 
-        try:
-            action = getattr(self, action_name)
-        except AttributeError as exc:
-            exc.args = ('Unimplemented action %r' % action_name,)
-            raise
-
+        action = getattr(self, action_name, self.http_method_not_allowed)
         return action
 
     def perform_action(self, *args, **kwargs):
@@ -197,7 +200,7 @@ class Resource(object):
 
         :param exc: the exception to be handled.
         """
-        if isinstance(exc, HTTPException):
+        if isinstance(exc, exceptions.HTTPException):
             headers = dict(exc.get_headers(self.request.environ))
             rv = ({'message': exc.description}, exc.code, headers)
             return rv

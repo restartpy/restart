@@ -71,11 +71,12 @@ class TestResource(object):
         data = {'hello': 'world'}
         request = factory.patch('/', data=data)
         resource = self.make_resource()
+        response = resource.dispatch_request(request)
 
-        with pytest.raises(AttributeError) as exc:
-            resource.dispatch_request(request)
-        expected_exc_msg = "Unimplemented action 'update'"
-        assert str(exc.value) == expected_exc_msg
+        assert isinstance(response, Response)
+        assert response.data == ('{"message": "The method is not allowed '
+                                 'for the requested URL."}')
+        assert response.status_code == 405
 
     def test_dispatch_request_with_action_exception(self):
         data = {'hello': 'world'}
