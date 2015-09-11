@@ -44,8 +44,9 @@ class Echo(Resource):
 
 class TestResource(object):
 
-    def make_resource(self, action_map=config.ACTION_MAP):
-        return Echo(action_map)
+    def make_resource(self, action_map=config.ACTION_MAP,
+                      resource_class=Echo):
+        return resource_class(action_map)
 
     def test_dispatch_request(self):
         data = {'hello': 'world'}
@@ -101,45 +102,52 @@ class TestResource(object):
         rv = resource.handle_exception(exc)
         assert rv == ({'message': None}, None, {'Content-Type': 'text/html'})
 
+    def test_middlewares_are_global_plus_resource_level(self):
+        # Save and change global middleware_classes
+        initial_global_middleware_classes = config.MIDDLEWARE_CLASSES
+        config.MIDDLEWARE_CLASSES = ('test_resource.RefuseRequestMiddleware',)
+
+        class Demo(Echo):
+            middleware_classes = (AlterRequestMiddleware,)
+
+        refuse_middleware, alter_middleware = Demo.middlewares
+        assert isinstance(refuse_middleware, RefuseRequestMiddleware)
+        assert isinstance(alter_middleware, AlterRequestMiddleware)
+
+        # Retrieve global middleware_classes
+        config.MIDDLEWARE_CLASSES = initial_global_middleware_classes
+
     def test_perform_action_with_request_middlewares(self):
-        # Save and change middlewares of Echo class
-        initial_middlewares = Echo.middlewares
-        Echo._middlewares = (
-            RefuseRequestMiddleware(),
-            AlterRequestMiddleware()
-        )
+        class Demo(Echo):
+            middleware_classes = (
+                RefuseRequestMiddleware,
+                AlterRequestMiddleware
+            )
 
         data = {'hello': 'world'}
         request = factory.get('/', data=data)
-        resource = self.make_resource()
+        resource = self.make_resource(resource_class=Demo)
         response = resource.dispatch_request(request)
 
         assert isinstance(response, Response)
         assert response.data == '"You are refused"'
         assert response.status_code == 200
 
-        # Retrieve middlewares of Echo class
-        Echo._middlewares = initial_middlewares
-
     def test_perform_action_with_alter_middlewares(self):
-        # Save and change middlewares of Echo class
-        initial_middlewares = Echo.middlewares
-        Echo._middlewares = (
-            AlterRequestMiddleware(),
-            AlterResponseMiddleware()
-        )
+        class Demo(Echo):
+            middleware_classes = (
+                AlterRequestMiddleware,
+                AlterResponseMiddleware
+            )
 
         data = {'hello': 'world'}
         request = factory.get('/', data=data)
-        resource = self.make_resource()
+        resource = self.make_resource(resource_class=Demo)
         response = resource.dispatch_request(request)
 
         assert isinstance(response, Response)
         assert 'tag' in response.data
         assert response.status_code == 201
-
-        # Retrieve middlewares of Echo class
-        Echo._middlewares = initial_middlewares
 
     def test_make_response_with_data(self):
         rv = {'hello': 'world'}

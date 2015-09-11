@@ -47,9 +47,13 @@ class Resource(object):
             The first is global middleware classes (in order) and
             then is resource-level middleware classes (in order).
         """
-        middleware_classes = config.MIDDLEWARE_CLASSES + cls.middleware_classes
+        global_middleware_classes = tuple(
+            import_string(middleware_class_string)
+            for middleware_class_string in config.MIDDLEWARE_CLASSES
+        )
+        middleware_classes = global_middleware_classes + cls.middleware_classes
         return tuple(
-            import_string(middleware_class)()
+            middleware_class()
             for middleware_class in middleware_classes
         )
 
