@@ -30,7 +30,7 @@ setup(
         'six==1.9.0',
         'Werkzeug>=0.9',
         'click==4.0',
-        'python-easyconfig==0.1.2',
+        'python-easyconfig==0.1.5',
     ],
     entry_points={
         'console_scripts': [
