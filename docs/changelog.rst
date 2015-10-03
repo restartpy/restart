@@ -4,6 +4,25 @@ RESTArt Changelog
 Here you can see the full list of changes between each RESTArt release.
 
 
+Version 0.1.0
+-------------
+
+Released on Oct 3rd 2015.
+
+- Add support for resource-level middleware classes
+- Bind a mutable attribute (whose name starts with an underscore) to each request property
+- Fix bugs for importing extensions
+- Refactor the logic for parsing request data or files
+- Refactor the logic for rendering response data
+- Add the `SERVER_NAME` :ref:`configuration` option
+- Add support for registering URIs with format suffixes
+- Add changelog
+- Add support for Python 2/3 compatibility
+- Re-raise unhandled exceptions with their tracebacks
+- Add :meth:`restart.resource.Resource.http_method_not_allowed` as the default action
+- Get multiple query arguments from the request correctly
+
+
 Version 0.0.8
 -------------
 
