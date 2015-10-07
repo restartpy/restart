@@ -1,12 +1,15 @@
 from __future__ import absolute_import
 
 import pytest
-from werkzeug.routing import Map
+from werkzeug.wrappers import Response as WerkzeugSpecificResponse
 
 from restart.api import RESTArt
 from restart.resource import Resource
+from restart.response import Response
 from restart.adapter import Adapter, WerkzeugAdapter
+from restart.testing import RequestFactory
 
+factory = RequestFactory()
 
 api = RESTArt()
 
@@ -19,9 +22,13 @@ class Demo(Resource):
         return "I'm a demo"
 
 
+def dummy_handler(*args, **kwargs):
+    return Response('dummy')
+
+
 class TestAdapter(object):
 
-    def test_adapt(self):
+    def test_adapt_rules(self):
         adapter = Adapter(api)
         adapted_rules = adapter.adapted_rules
 
@@ -34,17 +41,26 @@ class TestAdapter(object):
         assert rule.methods == ['GET']
         assert rule.handler.resource_class == Demo
 
-    def test_final_rules(self):
+    def test_adapt_handler(self):
         adapter = Adapter(api)
         with pytest.raises(NotImplementedError):
-            adapter.final_rules
+            adapter.adapt_handler(dummy_handler)
+
+    def test_wsgi_app(self):
+        adapter = Adapter(api)
+        with pytest.raises(NotImplementedError):
+            adapter.wsgi_app(None, None)
+
+    def test_get_embedded_rules(self):
+        adapter = Adapter(api)
+        with pytest.raises(NotImplementedError):
+            adapter.get_embedded_rules()
 
 
 class TestWerkzeugAdapter(object):
 
-    def test_final_rules(self):
+    def test_adapt_handler(self):
         adapter = WerkzeugAdapter(api)
-        final_rules = adapter.final_rules
-
-        assert isinstance(final_rules, Map)
-        assert len(final_rules._rules) == 1
+        request = factory.get('/demo')
+        response = adapter.adapt_handler(dummy_handler, request)
+        assert isinstance(response, WerkzeugSpecificResponse)

@@ -4,10 +4,15 @@ import functools
 
 from six import iteritems
 from werkzeug.routing import Map as WerkzeugMap, Rule as WerkzeugRule
+from werkzeug.wrappers import (
+    Request as WerkzeugSpecificRequest,
+    Response as WerkzeugSpecificResponse
+)
+from werkzeug.exceptions import NotFound
 
 from .api import Rule
-from .request import Request, WerkzeugRequest
-from .response import Response, WerkzeugResponse
+from .request import WerkzeugRequest
+from .response import WerkzeugResponse
 
 
 class Adapter(object):
@@ -16,32 +21,15 @@ class Adapter(object):
     :param api: the RESTArt API to adapt.
     """
 
-    #: The class that is used to adapt request objects.  See
-    #: :class:`~restart.request.Request` for more information.
-    request_class = Request
-
-    #: The class that is used to adapt response objects.  See
-    #: :class:`~restart.response.Response` for more information.
-    response_class = Response
-
     def __init__(self, api):
-        self.api = api
-        self.adapted_rules = self.adapt(api.rules)
+        self.adapted_rules = self.adapt_rules(api.rules)
 
-    def adapt(self, rules):
+    def adapt_rules(self, rules):
         """Adapt the rules to be framework-specific."""
         def decorator(handler):
             @functools.wraps(handler)
-            def adapted_handler(request, *args, **kwargs):
-                """Adapt the request object and the response object for
-                each `handler` in `rules`.
-                """
-                adapted_request = self.request_class(request)
-                response = handler(adapted_request, *args, **kwargs)
-                adapted_response = self.response_class(
-                    response.data, response.status_code, response.headers
-                )
-                return adapted_response.get_specific_response()
+            def adapted_handler(*args, **kwargs):
+                return self.adapt_handler(handler, *args, **kwargs)
             return adapted_handler
 
         adapted_rules = {
@@ -50,25 +38,74 @@ class Adapter(object):
         }
         return adapted_rules
 
-    @property
-    def final_rules(self):
+    def adapt_handler(self, handler, *args, **kwargs):
+        """Adapt the request object and the response object for
+        the `handler` function.
+
+        :param handler: the handler function to be adapted.
+        :param args: a list of positional arguments that will be passed
+                     to the handler.
+        :param kwargs: a dictionary of keyword arguments that will be passed
+                       to the handler.
+        """
+        raise NotImplementedError()
+
+    def wsgi_app(self, environ, start_response):
+        """The actual framework-specific WSGI application.
+
+        See :meth:`~restart.seving.Service.wsgi_app` for the
+        meanings of the parameters.
+        """
+        raise NotImplementedError()
+
+    def get_embedded_rules(self):
+        """Get the framework-specific rules used to be embedded into
+        an existing or legacy application.
+        """
         raise NotImplementedError()
 
 
 class WerkzeugAdapter(Adapter):
 
-    #: The class that is used to adapt request objects.  See
-    #: :class:`~restart.request.WerkzeugRequest` for more information.
-    request_class = WerkzeugRequest
-
-    #: The class that is used to adapt response objects.  See
-    #: :class:`~restart.response.WerkzeugResponse` for more information.
-    response_class = WerkzeugResponse
-
-    @property
-    def final_rules(self):
-        rule_map = WerkzeugMap([
+    def __init__(self, *args, **kwargs):
+        super(WerkzeugAdapter, self).__init__(*args, **kwargs)
+        self.rule_map = WerkzeugMap([
             WerkzeugRule(rule.uri, endpoint=endpoint, methods=rule.methods)
             for endpoint, rule in iteritems(self.adapted_rules)
         ])
-        return rule_map
+
+    def adapt_handler(self, handler, request, *args, **kwargs):
+        """Adapt the request object and the response object for
+        the `handler` function.
+
+        :param handler: the handler function to be adapted.
+        :param request: the Werkzeug request object.
+        :param args: a list of positional arguments that will be passed
+                     to the handler.
+        :param kwargs: a dictionary of keyword arguments that will be passed
+                       to the handler.
+        """
+        adapted_request = WerkzeugRequest(request)
+        response = handler(adapted_request, *args, **kwargs)
+        adapted_response = WerkzeugResponse(
+            response.data, response.status_code, response.headers
+        )
+        return adapted_response.get_specific_response()
+
+    def wsgi_app(self, environ, start_response):
+        """The actual Werkzeug-specific WSGI application.
+
+        See :meth:`~restart.seving.Service.wsgi_app` for the
+        meanings of the parameters.
+        """
+        request = WerkzeugSpecificRequest(environ)
+        adapter = self.rule_map.bind_to_environ(request.environ)
+        try:
+            endpoint, kwargs = adapter.match()
+        except NotFound:
+            response = WerkzeugSpecificResponse(
+                'The requested URI was not found.', 404
+            )
+        else:
+            response = self.adapted_rules[endpoint].handler(request, **kwargs)
+        return response(environ, start_response)

@@ -1,8 +1,6 @@
 from __future__ import absolute_import
 
-from werkzeug.wrappers import Request, Response
 from werkzeug.serving import run_simple
-from werkzeug.exceptions import NotFound
 
 from .adapter import WerkzeugAdapter
 
@@ -11,16 +9,25 @@ class Service(object):
     """The service class for serving the RESTArt API.
 
     :param api: the RESTArt API.
+    :param adapter_class: the class that is used to adapt the api object.
+                          See :class:`~restart.adapter.WerkzeugAdapter`
+                          for more information.
     """
 
-    #: The class that is used to adapt the api object.  See
-    #: :class:`~restart.adapter.WerkzeugAdapter` for more information.
-    adapter_class = WerkzeugAdapter
+    def __init__(self, api, adapter_class=WerkzeugAdapter):
+        self.adapter = adapter_class(api)
 
-    def __init__(self, api):
-        adapter = self.adapter_class(api)
-        self.adapted_rules = adapter.adapted_rules
-        self.final_rules = adapter.final_rules
+    @property
+    def rules(self):
+        """The framework-specific API rules."""
+        return self.adapter.adapted_rules
+
+    @property
+    def embedded_rules(self):
+        """The framework-specific rules used to be embedded into
+        an existing or legacy application.
+        """
+        return self.adapter.get_embedded_rules()
 
     def wsgi_app(self, environ, start_response):
         """The actual WSGI application.
@@ -30,15 +37,7 @@ class Service(object):
                                of headers and an optional exception context
                                to start the response
         """
-        request = Request(environ)
-        adapter = self.final_rules.bind_to_environ(request.environ)
-        try:
-            endpoint, kwargs = adapter.match()
-        except NotFound:
-            response = Response('The requested URI was not found.', 404)
-        else:
-            response = self.adapted_rules[endpoint].handler(request, **kwargs)
-        return response(environ, start_response)
+        return self.adapter.wsgi_app(environ, start_response)
 
     def __call__(self, environ, start_response):
         """Make the Service object itself to be a WSGI application.
