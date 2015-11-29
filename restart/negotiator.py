@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from werkzeug.http import parse_options_header
 
-from .exceptions import UnsupportedMediaType, NotFound
+from . import exceptions
 
 
 class Negotiator(object):
@@ -20,8 +20,9 @@ class Negotiator(object):
             if parser_class.content_type == content_type:
                 return parser_class
 
-        raise UnsupportedMediaType('Unsupported content type "%s" in '
-                                   'request' % content_type)
+        raise exceptions.UnsupportedMediaType(
+            'Unsupported content type "%s" in request' % content_type
+        )
 
     def select_renderer(self, renderer_classes, format_suffix):
         """Select the proper renderer class.
@@ -34,13 +35,17 @@ class Negotiator(object):
         :param renderer_classes: the renderer classes to select from.
         :param format_suffix: the format suffix of the request uri.
         """
-        # The format defaults to 'json' if not specified
+        # If no format suffix is specified, select the first renderer
+        # class (if provided), or raise a NotAcceptable error.
         if not format_suffix:
-            format_suffix = 'json'
+            if renderer_classes:
+                return renderer_classes[0]
+            else:
+                raise exceptions.NotAcceptable()
 
         for renderer_class in renderer_classes:
             if renderer_class.format_suffix == format_suffix:
                 return renderer_class
 
-        raise NotFound('The requested resource with format ".%s" '
-                       'is not found' % format_suffix)
+        raise exceptions.NotFound('The requested resource with format '
+                                  '".%s" is not found' % format_suffix)
