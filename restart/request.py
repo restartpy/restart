@@ -14,7 +14,7 @@ class Request(object):
     def __init__(self, initial_request):
         self.initial_request = initial_request
 
-    def parse(self, negotiator, parser_classes):
+    def parse(self, negotiator, parser_classes, parser_context=None):
         """Return a request object with the data parsed, which is a
         dictionary. If the request payload is empty, the parsed data
         will be an empty dictionary.
@@ -25,6 +25,8 @@ class Request(object):
         :param parser_classes: the parser classes to select from.
                                See :ref:`parser-objects` for
                                information about parsers.
+        :param parser_context: a dictionary containing extra context
+                               data that can be useful to the parser.
         """
         if self.content_length:
             parser_class = negotiator.select_parser(
@@ -32,7 +34,7 @@ class Request(object):
             )
             parser = parser_class()
             result = parser.parse(self.stream, self.content_type,
-                                  self.content_length)
+                                  self.content_length, parser_context)
             if isinstance(result, tuple):
                 assert len(result) == 2, \
                         'Expected a two-tuple of (data, files)'

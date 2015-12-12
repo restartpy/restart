@@ -16,10 +16,14 @@ class Parser(object):
     #: The content type bound to this parser.
     content_type = None
 
-    def parse(self, stream, content_type, content_length):
+    def parse(self, stream, content_type, content_length, context=None):
         """Parse the `stream`.
 
         :param stream: the stream to be parsed.
+        :param content_type: the content type of the request payload.
+        :param content_length: the content length of the request payload.
+        :param context: a dictionary containing extra context data
+                        that can be useful for parsing.
         """
         raise NotImplementedError()
 
@@ -30,10 +34,14 @@ class JSONParser(Parser):
     #: The content type bound to this parser.
     content_type = 'application/json'
 
-    def parse(self, stream, content_type, content_length):
+    def parse(self, stream, content_type, content_length, context=None):
         """Parse the `stream` as JSON.
 
         :param stream: the stream to be parsed.
+        :param content_type: the content type of the request payload.
+        :param content_length: the content length of the request payload.
+        :param context: a dictionary containing extra context data
+                        that can be useful for parsing.
         """
         data = stream.read().decode('utf-8')
         try:
@@ -49,10 +57,14 @@ class MultiPartParser(Parser):
     #: The content type bound to this parser.
     content_type = 'multipart/form-data'
 
-    def parse(self, stream, content_type, content_length):
+    def parse(self, stream, content_type, content_length, context=None):
         """Parse the `stream` as a multipart encoded form.
 
         :param stream: the stream to be parsed.
+        :param content_type: the content type of the request payload.
+        :param content_length: the content length of the request payload.
+        :param context: a dictionary containing extra context data
+                        that can be useful for parsing.
         """
         if content_length is None:
             raise BadRequest('MultiPartParser.parse() requires '
@@ -79,10 +91,14 @@ class URLEncodedParser(Parser):
     #: The content type bound to this parser.
     content_type = 'application/x-www-form-urlencoded'
 
-    def parse(self, stream, content_type, content_length):
+    def parse(self, stream, content_type, content_length, context=None):
         """Parse the `stream` as a URL encoded form.
 
         :param stream: the stream to be parsed.
+        :param content_type: the content type of the request payload.
+        :param content_length: the content length of the request payload.
+        :param context: a dictionary containing extra context data
+                        that can be useful for parsing.
         """
         data = url_decode_stream(stream)
         return data.to_dict()

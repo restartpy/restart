@@ -26,7 +26,8 @@ class Response(object):
             _status = '%d UNKNOWN' % code
         return _status
 
-    def render(self, negotiator, renderer_classes, format_suffix):
+    def render(self, negotiator, renderer_classes, format_suffix,
+               renderer_context=None):
         """Return a response object with the data rendered.
 
         :param negotiator: the negotiator object used to select
@@ -36,12 +37,14 @@ class Response(object):
                                See :ref:`renderer-objects` for
                                information about renderers.
         :param format_suffix: the format suffix of the request uri.
+        :param renderer_context: a dictionary containing extra context
+                                 data that can be useful to the renderer.
         """
         renderer_class = negotiator.select_renderer(
             renderer_classes, format_suffix
         )
         renderer = renderer_class()
-        self.data = renderer.render(self.data)
+        self.data = renderer.render(self.data, renderer_context)
         self.headers.update({'Content-Type': renderer.content_type})
         return self
 

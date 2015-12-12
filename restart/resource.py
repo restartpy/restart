@@ -86,6 +86,36 @@ class Resource(object):
         """
         self.logger.exception('Exception on %s' % self._get_head())
 
+    def get_parser_context(self, request, args, kwargs):
+        """Return a dictionary that represents a parser context.
+
+        :param request: the request object.
+        :param args: the positional arguments captured from the URI.
+        :param kwargs: the keyword arguments captured from the URI.
+        """
+        return {
+            'resource': self,
+            'request': request,
+            'args': args,
+            'kwargs': kwargs
+        }
+
+    def get_renderer_context(self, request, args, kwargs, response):
+        """Return a dictionary that represents a renderer context.
+
+        :param request: the request object.
+        :param args: the positional arguments captured from the URI.
+        :param kwargs: the keyword arguments captured from the URI.
+        :param response: the response object.
+        """
+        return {
+            'resource': self,
+            'request': request,
+            'args': args,
+            'kwargs': kwargs,
+            'response': response
+        }
+
     def dispatch_request(self, request, *args, **kwargs):
         """Does the request dispatching. Matches the HTTP method and return
         the return value of the bound action.
@@ -97,7 +127,9 @@ class Resource(object):
         negotiator = self.negotiator_class()
         self.format_suffix = kwargs.pop('format', None)
 
-        self.request = request.parse(negotiator, self.parser_classes)
+        parser_context = self.get_parser_context(request, args, kwargs)
+        self.request = request.parse(negotiator, self.parser_classes,
+                                     parser_context)
         self.log_message('<Request> %s' % request.data)
 
         try:
@@ -108,8 +140,10 @@ class Resource(object):
         response = self.make_response(rv)
         self.log_message('<Response> %s %s' % (response.status, response.data))
 
+        renderer_context = self.get_renderer_context(request, args, kwargs,
+                                                     response)
         return response.render(negotiator, self.renderer_classes,
-                               self.format_suffix)
+                               self.format_suffix, renderer_context)
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         """The default action handler if the corresponding action for

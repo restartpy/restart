@@ -12,10 +12,12 @@ class Renderer(object):
     #: The format suffix bound to this renderer.
     format_suffix = None
 
-    def render(self, data):
+    def render(self, data, context=None):
         """Render `data`.
 
         :param data: the data to be rendered.
+        :param context: a dictionary containing extra context data
+                        that can be useful for rendering.
         """
         raise NotImplementedError()
 
@@ -29,9 +31,11 @@ class JSONRenderer(Renderer):
     #: The format suffix bound to this renderer.
     format_suffix = 'json'
 
-    def render(self, data):
+    def render(self, data, context=None):
         """Render `data` into JSON.
 
         :param data: the data to be rendered.
+        :param context: a dictionary containing extra context data
+                        that can be useful for rendering.
         """
         return json.dumps(data)
