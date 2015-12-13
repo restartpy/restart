@@ -123,3 +123,24 @@ Service Object
 .. autoclass:: Service
    :members:
    :special-members: __call__
+
+
+Utilities
+---------
+
+.. module:: restart.utils
+
+.. autoclass:: locked_cached_property
+   :members:
+
+.. autoclass:: classproperty
+   :members:
+
+.. autoclass:: locked_cached_classproperty
+   :members:
+
+.. autofunction:: load_resources
+
+.. autofunction:: expand_wildcards
+
+.. autofunction:: make_location_header

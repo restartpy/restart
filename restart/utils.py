@@ -9,9 +9,10 @@ from werkzeug.utils import import_string
 
 
 def load_resources(module_names):
-    """Import all modules in `module_names` to load resources.
+    """Import all modules in ``module_names`` to load resources.
 
-    Example usage:
+    Example usage::
+
         load_resources(['yourapi.resources.users.resource'])
         load_resources(['yourapi.resources.orders.resource'])
 
@@ -32,9 +33,10 @@ def load_resources(module_names):
 
 
 def expand_wildcards(module_name):
-    """Expand the wildcards in `module_name` based on `sys.path`.
+    """Expand the wildcards in ``module_name`` based on ``sys.path``.
 
-    Suppose the directory structure of "yourapi" is as below:
+    Suppose the directory structure of "yourapi" is as below::
+
         yourapi
         |-- __init__.py
         `-- resources
@@ -44,7 +46,9 @@ def expand_wildcards(module_name):
             `-- orders
                 |-- __init__.py
                 `-- resource.py
-    Then:
+
+    Then::
+
         expand_wildcards('yourapi.resources.*.resource')
         =>
         ['yourapi.resources.users.resource',
@@ -78,7 +82,7 @@ class locked_cached_property(object):
 
     This decorator has a lock for thread safety.
 
-    Inspired by `Flask`.
+    Inspired by ``Flask``.
     """
 
     # sentinel
@@ -124,7 +128,8 @@ class classproperty(property):
 
 
 class locked_cached_classproperty(locked_cached_property):
-    """The lazy version of classproperty, like `locked_cached_property`.
+    """The lazy version of ``classproperty``, which converts a method into
+    a lazy class property.
     """
 
     def __init__(self, method=None, name=None):
