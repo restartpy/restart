@@ -4,6 +4,17 @@ RESTArt Changelog
 Here you can see the full list of changes between each RESTArt release.
 
 
+Version 0.1.1 - Dev
+-------------------
+
+(release date to be announced)
+
+- Refactor the Adapter module for better usage
+- Add `-a, --adapter` argument to the restart utility
+- Select the first renderer class if no format suffix is specified
+- Add `context` keyword argument to :meth:`restart.parsers.Parser.parse` and :meth:`restart.renderers.Renderer.render`
+
+
 Version 0.1.0
 -------------
 
