@@ -13,6 +13,7 @@ Version 0.1.1 - Dev
 - Add `-a, --adapter` argument to the restart utility
 - Select the first renderer class if no format suffix is specified
 - Add `context` keyword argument to :meth:`restart.parsers.Parser.parse` and :meth:`restart.renderers.Renderer.render`
+- Fix a bug of :class:`restart.utils.locked_cached_classproperty`
 
 
 Version 0.1.0
