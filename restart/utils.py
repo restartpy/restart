@@ -138,8 +138,17 @@ class locked_cached_classproperty(locked_cached_property):
     def __get__(self, obj, cls):
         with self.lock:
             value = cls.__dict__.get(self.name, self._missing)
-            if value is self._missing:
+            # There are two cases where the property is treated as missing:
+            # 1. the property name does not exist in `cls.__dict__`
+            # 2. the property value is an instance of this class, which
+            #    is the default value when the property name equals to
+            #    the name of the decorated method (i.e. `method.__name__`)
+            if value is self._missing or isinstance(value, self.__class__):
                 value = self.method.__get__(obj, cls)
+                # In new-style classes, class.__dict__ is of type
+                # `dict_proxy`, which can only be modified by `setattr`
+                # (instead of `class.__dict__[key] = value`).
+                # See http://stackoverflow.com/questions/432786/how-can-i-assign-a-new-class-attribute-via-dict-in-python
                 setattr(cls, self.name, value)
             return value
 

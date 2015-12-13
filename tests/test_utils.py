@@ -6,6 +6,7 @@ import uuid
 import shutil
 import tempfile
 
+import six
 import pytest
 
 from restart.utils import (
@@ -134,7 +135,10 @@ class TestUtils(object):
             def dynamic(cls):
                 return str(uuid.uuid4())
 
+        assert isinstance(Sample.static, six.string_types)
         assert Sample.static == Sample.static
+
+        assert isinstance(Sample.dynamic, six.string_types)
         assert Sample.dynamic != Sample.dynamic
 
     def test_locked_cached_classproperty_with_alias(self):
