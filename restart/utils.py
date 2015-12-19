@@ -83,6 +83,11 @@ class locked_cached_property(object):
     This decorator has a lock for thread safety.
 
     Inspired by ``Flask``.
+
+    :param method: the method that will be decorated.
+    :param name: the name of the cached property, which holds the
+                 calculated result. If not specified, the ``<method-name>``
+                 (the name of the decorated method) will be used.
     """
 
     # sentinel
@@ -130,6 +135,12 @@ class classproperty(property):
 class locked_cached_classproperty(locked_cached_property):
     """The lazy version of ``classproperty``, which converts a method into
     a lazy class property.
+
+    :param method: the method that will be decorated.
+    :param name: the name of the cached class property, which holds the
+                 calculated result. If not specified, the name with the
+                 form of ``_locked_cached_classproperty_<method-name>``
+                 will be used.
     """
 
     def __call__(self, method):

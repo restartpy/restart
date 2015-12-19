@@ -22,6 +22,8 @@ SERVER_NAME  .. autodata_value:: SERVER_NAME  The server name (scheme + domain +
 ===========  ===============================  ========================================
 
 
+.. _action-mapping:
+
 Action mapping
 ^^^^^^^^^^^^^^
 

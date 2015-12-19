@@ -48,6 +48,8 @@ Now, you can run the API like this::
     $ python runserver.py
 
 
+.. _command-line-utility:
+
 The Command Line Utility
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
