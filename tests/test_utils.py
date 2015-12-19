@@ -125,7 +125,7 @@ class TestUtils(object):
 
         assert SubSample.name == 'sub_sample'
 
-    def test_locked_cached_classproperty(self):
+    def test_locked_cached_classproperty_vs_classproperty(self):
         class Sample(object):
             @locked_cached_classproperty
             def static(cls):
@@ -141,16 +141,37 @@ class TestUtils(object):
         assert isinstance(Sample.dynamic, six.string_types)
         assert Sample.dynamic != Sample.dynamic
 
-    def test_locked_cached_classproperty_with_alias(self):
+    def test_locked_cached_classproperty_with_default_alias(self):
+        class Sample(object):
+            @locked_cached_classproperty
+            def static(cls):
+                return str(uuid.uuid4())
+
+        assert isinstance(Sample.static, six.string_types)
+        assert Sample.static == Sample.static
+
+        # The property value always equals the value of its alias property
+        assert Sample.static == Sample._locked_cached_classproperty_static
+
+        # Even if the value of the alias property changes
+        Sample._locked_cached_classproperty_static = 'changed'
+        assert Sample.static == 'changed'
+
+    def test_locked_cached_classproperty_with_specified_alias(self):
         class Sample(object):
             @locked_cached_classproperty(name='_static')
             def static(cls):
                 return str(uuid.uuid4())
 
+        assert isinstance(Sample.static, six.string_types)
         assert Sample.static == Sample.static
 
-        Sample._static = 0
-        assert Sample.static == 0
+        # The property value always equals the value of its alias property
+        assert Sample.static == Sample._static
+
+        # Even if the value of the alias property changes
+        Sample._static = 'changed'
+        assert Sample.static == 'changed'
 
     def test_make_location_header(self):
         from restart.testing import RequestFactory

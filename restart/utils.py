@@ -132,23 +132,17 @@ class locked_cached_classproperty(locked_cached_property):
     a lazy class property.
     """
 
-    def __init__(self, method=None, name=None):
-        super(locked_cached_classproperty, self).__init__(method, name)
-
     def __call__(self, method):
         self.method = classproperty(method)
-        self.name = self.name or method.__name__
+        self.name = self.name or (
+            '_%s_%s' % (self.__class__.__name__, method.__name__)
+        )
         return self
 
     def __get__(self, obj, cls):
         with self.lock:
             value = cls.__dict__.get(self.name, self._missing)
-            # There are two cases where the property is treated as missing:
-            # 1. the property name does not exist in `cls.__dict__`
-            # 2. the property value is an instance of this class, which
-            #    is the default value when the property name equals to
-            #    the name of the decorated method (i.e. `method.__name__`)
-            if value is self._missing or isinstance(value, self.__class__):
+            if value is self._missing:
                 value = self.method.__get__(obj, cls)
                 # In new-style classes, class.__dict__ is of type
                 # `dict_proxy`, which can only be modified by `setattr`
