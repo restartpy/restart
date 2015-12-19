@@ -6,7 +6,7 @@ from blog.api import api
 
 
 @api.register
-class Tag(Resource):
+class Tags(Resource):
     name = 'tags'
 
     def index(self, request):

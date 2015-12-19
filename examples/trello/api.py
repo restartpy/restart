@@ -21,7 +21,7 @@ cards = {
 
 
 @api.register(pk='<int:list_id>')
-class List(Resource):
+class Lists(Resource):
     name = 'lists'
 
     def index(self, request):
@@ -35,7 +35,7 @@ class List(Resource):
 
 
 @api.register(prefix='/lists/<int:list_id>/cards', pk='<int:card_id>')
-class Card(Resource):
+class Cards(Resource):
     name = 'cards'
 
     def index(self, request, list_id):

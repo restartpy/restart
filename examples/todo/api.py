@@ -17,7 +17,7 @@ todos = {
 
 
 @api.register(pk='<int:todo_id>')
-class Todo(Resource):
+class Todos(Resource):
     name = 'todos'
 
     def index(self, request):

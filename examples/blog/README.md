@@ -1,4 +1,4 @@
-# Trello
+# Blog
 
 A Blog example showing how to manage larger applications.
 
