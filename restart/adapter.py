@@ -69,10 +69,7 @@ class WerkzeugAdapter(Adapter):
 
     def __init__(self, *args, **kwargs):
         super(WerkzeugAdapter, self).__init__(*args, **kwargs)
-        self.rule_map = WerkzeugMap([
-            WerkzeugRule(rule.uri, endpoint=endpoint, methods=rule.methods)
-            for endpoint, rule in iteritems(self.adapted_rules)
-        ])
+        self.rule_map = WerkzeugMap(self.get_embedded_rules())
 
     def adapt_handler(self, handler, request, *args, **kwargs):
         """Adapt the request object and the response object for
@@ -109,3 +106,31 @@ class WerkzeugAdapter(Adapter):
         else:
             response = self.adapted_rules[endpoint].handler(request, **kwargs)
         return response(environ, start_response)
+
+    def get_embedded_rules(self):
+        """Get the Werkzeug-specific rules used to be embedded into
+        an existing or legacy application.
+
+        Example::
+
+            # The existing Werkzeug application,
+            # whose URL map is `app.url_map`
+            app = ...
+            ...
+
+            # The RESTArt API
+            from restart.api import RESTArt
+            api = RESTArt()
+            ...
+
+            # Embed RESTArt into Werkzeug
+            from restart.serving import Service
+            service = Service(api)
+            for rule in service.embedded_rules:
+                app.url_map.add(rule)
+        """
+        rules = [
+            WerkzeugRule(rule.uri, endpoint=endpoint, methods=rule.methods)
+            for endpoint, rule in iteritems(self.adapted_rules)
+        ]
+        return rules
