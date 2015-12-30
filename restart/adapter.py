@@ -53,7 +53,7 @@ class Adapter(object):
     def wsgi_app(self, environ, start_response):
         """The actual framework-specific WSGI application.
 
-        See :meth:`~restart.seving.Service.wsgi_app` for the
+        See :meth:`~restart.serving.Service.wsgi_app` for the
         meanings of the parameters.
         """
         raise NotImplementedError()
@@ -92,7 +92,7 @@ class WerkzeugAdapter(Adapter):
     def wsgi_app(self, environ, start_response):
         """The actual Werkzeug-specific WSGI application.
 
-        See :meth:`~restart.seving.Service.wsgi_app` for the
+        See :meth:`~restart.serving.Service.wsgi_app` for the
         meanings of the parameters.
         """
         request = WerkzeugSpecificRequest(environ)
