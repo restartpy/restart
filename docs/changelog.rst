@@ -4,10 +4,16 @@ RESTArt Changelog
 Here you can see the full list of changes between each RESTArt release.
 
 
-Version 0.1.1 - Dev
+Version 0.1.3 - Dev
 -------------------
 
 (release date to be announced)
+
+
+Version 0.1.2
+-------------
+
+Released on Dec 30th 2015.
 
 - Refactor the Adapter module for better usage
 - Add ``-a, --adapter`` argument to the restart utility
@@ -18,6 +24,8 @@ Version 0.1.1 - Dev
   as the default name of the cached class property, which holds the calculated result for the
   :class:`locked_cached_classproperty <restart.utils.locked_cached_classproperty>`
   decorated class property
+- Implement the :meth:`get_embedded_rules <restart.adapter.WerkzeugAdapter.get_embedded_rules>`
+  method of WerkzeugAdapter
 - Update documentation
 - Update examples
 
