@@ -18,6 +18,7 @@ This section covers most things you need to know to build REST APIs with RESTArt
    configuration
    middleware
    testing
+   framework-integration
    best-practices
    thanks
 
