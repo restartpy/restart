@@ -239,6 +239,10 @@ class Resource(object):
         :param exc: the exception to be handled.
         """
         if isinstance(exc, exceptions.HTTPException):
+            # Always render `HTTPException` messages into JSON
+            from .renderers import JSONRenderer
+            self.renderer_classes = (JSONRenderer,)
+
             headers = dict(exc.get_headers(self.request.environ))
             rv = ({'message': exc.description}, exc.code, headers)
             return rv
