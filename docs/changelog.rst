@@ -9,6 +9,9 @@ Version 0.1.3 - Dev
 
 (release date to be announced)
 
+- Always render `HTTPException` messages into JSON
+- Update documentation
+
 
 Version 0.1.2
 -------------
