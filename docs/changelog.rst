@@ -10,8 +10,9 @@ Version 0.1.3 - Dev
 (release date to be announced)
 
 - Always render ``HTTPException`` messages into JSON
-- Update documentation
 - Move ``CORSMiddleware`` out of RESTArt (use the `RESTArt-CrossDomain <https://github.com/RussellLuo/restart-crossdomain>`_ extension for CORS instead)
+- Remove tests for ``CORSMiddleware``
+- Update documentation
 
 
 Version 0.1.2
