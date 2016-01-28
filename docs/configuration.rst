@@ -63,6 +63,8 @@ LOGGER_DATE_FORMAT  .. autodata_value:: LOGGER_DATE_FORMAT  The logging format f
 ==================  ======================================  ====================================
 
 
+.. _option-middleware-class:
+
 Middlewares
 ^^^^^^^^^^^
 

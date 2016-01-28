@@ -94,15 +94,6 @@ Renderer  Objects
    :members:
 
 
-Middleware Objects
-------------------
-
-.. module:: restart.middlewares
-
-.. autoclass:: CORSMiddleware
-   :members:
-
-
 Adapter Objects
 ---------------
 
