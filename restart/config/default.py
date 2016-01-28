@@ -57,13 +57,3 @@ LOGGER_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 #: The middleware classes used to alter RESTArt's requests and responses.
 MIDDLEWARE_CLASSES = ()
-
-
-# -- CORS (Cross-Origin Resource Sharing) --
-
-#: Access control options for CORS
-CORS_ALLOW_ORIGIN = '*'  # any domain
-CORS_ALLOW_CREDENTIALS = False
-CORS_ALLOW_METHODS = ('GET', 'POST', 'PUT', 'PATCH', 'DELETE')
-CORS_ALLOW_HEADERS = ()  # any headers
-CORS_MAX_AGE = 864000  # 10 days

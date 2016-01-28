@@ -76,25 +76,6 @@ MIDDLEWARE_CLASSES  .. autodata_value:: MIDDLEWARE_CLASSES  The middleware class
 ==================  ======================================  ====================================
 
 
-CORS (Cross-Origin Resource Sharing)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-======================  ==========================================  =====================================
-Option name             Default value                               Description
-======================  ==========================================  =====================================
-CORS_ALLOW_ORIGIN       .. autodata_value:: CORS_ALLOW_ORIGIN       The option that determines the header
-                                                                    ``Access-Control-Allow-Origin``.
-CORS_ALLOW_CREDENTIALS  .. autodata_value:: CORS_ALLOW_CREDENTIALS  The option that determines the header
-                                                                    ``Access-Control-Allow-Credentials``.
-CORS_ALLOW_METHODS      .. autodata_value:: CORS_ALLOW_METHODS      The option that determines the header
-                                                                    ``Access-Control-Allow-Methods``.
-CORS_ALLOW_HEADERS      .. autodata_value:: CORS_ALLOW_HEADERS      The option that determines the header
-                                                                    ``Access-Control-Allow-Headers``.
-CORS_MAX_AGE            .. autodata_value:: CORS_MAX_AGE            The option that determines the header
-                                                                    ``Access-Control-Max-Age``.
-======================  ==========================================  =====================================
-
-
 Customization
 -------------
 
