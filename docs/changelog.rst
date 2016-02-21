@@ -4,16 +4,17 @@ RESTArt Changelog
 Here you can see the full list of changes between each RESTArt release.
 
 
-Version 0.1.3 - Dev
--------------------
+Version 0.1.3
+-------------
 
-(release date to be announced)
+Released on Feb 21st 2016.
 
 - Always render ``HTTPException`` messages into JSON
 - Move ``CORSMiddleware`` out of RESTArt (use the `RESTArt-CrossDomain <https://github.com/RussellLuo/restart-crossdomain>`_ extension for CORS instead)
 - Remove tests for ``CORSMiddleware``
 - Remove the configuration options for CORS
 - Update documentation
+- Upgrade the Python-EasyConfig dependency
 
 
 Version 0.1.2
