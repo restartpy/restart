@@ -67,7 +67,7 @@ def expand_wildcards(module_name):
     modnames = []
     for pyfile in pyfiles:
         relpath = pyfile[len(basedir) + 1:] if basedir else pyfile
-        modpath = re.sub('(/__init__)?.py', '', relpath)
+        modpath = re.sub('(/__init__)?\.py$', '', relpath)
         modname = modpath.replace('/', '.')
         modnames.append(modname)
     return modnames
