@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import re
 import os
 import sys
 import glob
@@ -65,9 +66,8 @@ def expand_wildcards(module_name):
 
     modnames = []
     for pyfile in pyfiles:
-        relpath = pyfile[len(basedir) + 1:]
-        modpath = relpath.rstrip('/__init__.py')
-        modpath = modpath.rstrip('.py')
+        relpath = pyfile[len(basedir) + 1:] if basedir else pyfile
+        modpath = re.sub('(/__init__)?.py', '', relpath)
         modname = modpath.replace('/', '.')
         modnames.append(modname)
     return modnames
