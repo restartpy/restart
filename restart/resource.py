@@ -128,11 +128,12 @@ class Resource(object):
         self.format_suffix = kwargs.pop('format', None)
 
         parser_context = self.get_parser_context(request, args, kwargs)
-        self.request = request.parse(negotiator, self.parser_classes,
-                                     parser_context)
-        self.log_message('<Request> %s' % request.data)
+        self.request = request
 
         try:
+            request.parse(negotiator, self.parser_classes, parser_context)
+            self.log_message('<Request> %s' % request.data)
+
             rv = self.perform_action(*args, **kwargs)
         except Exception as exc:
             rv = self.handle_exception(exc)

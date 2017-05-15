@@ -3,9 +3,10 @@ from __future__ import absolute_import
 import pytest
 
 from restart.config import config
+from restart.parsers import JSONParser
 from restart.resource import Resource
 from restart.response import Response, WerkzeugResponse
-from restart.exceptions import HTTPException
+from restart.exceptions import HTTPException, BadRequest
 from restart.testing import RequestFactory
 
 
@@ -79,12 +80,31 @@ class TestResource(object):
                                  'for the requested URL."}')
         assert response.status_code == 405
 
-    def test_dispatch_request_with_httpexception_rendered_into_json(self):
+    def test_dispatch_request_with_parser_httpexception_rendered_into_json(self):
+        class ExcParser(JSONParser):
+            def parse(self, stream, content_type, content_length, context=None):
+                raise BadRequest('Invalid request data.')
+
+        class Demo(Echo):
+            parser_classes = (ExcParser,)
+
+            def replace(self, request):
+                pass
+
+        data = '{"hello": "world"}'
+        request = factory.put('/', data=data, content_type='application/json')
+        resource = self.make_resource(resource_class=Demo)
+        response = resource.dispatch_request(request)
+
+        assert isinstance(response, Response)
+        assert response.data == '{"message": "Invalid request data."}'
+        assert response.status_code == 400
+
+    def test_dispatch_request_with_action_httpexception_rendered_into_json(self):
         class Demo(Echo):
             renderer_classes = ()  # No renderer class provided
 
             def replace(self, request):
-                from restart.exceptions import BadRequest
                 raise BadRequest('Invalid request data.')
 
         data = {'hello': 'world'}
