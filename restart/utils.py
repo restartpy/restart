@@ -70,7 +70,7 @@ def expand_wildcards(module_name):
         modpath = re.sub('(/__init__)?\.py$', '', relpath)
         modname = modpath.replace('/', '.')
         modnames.append(modname)
-    return modnames
+    return sorted(modnames)
 
 
 class locked_cached_property(object):

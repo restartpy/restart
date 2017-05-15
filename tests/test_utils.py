@@ -72,12 +72,12 @@ class TestUtils(object):
 
     def test_expand_wildcards(self):
         module_names = expand_wildcards('testapi.resources.*.resource')
-        assert module_names == ['testapi.resources.users.resource',
-                                'testapi.resources.orders.resource']
+        assert module_names == ['testapi.resources.orders.resource',
+                                'testapi.resources.users.resource']
 
         module_names = expand_wildcards('testapi.*.*.resource')
-        assert module_names == ['testapi.resources.users.resource',
-                                'testapi.resources.orders.resource']
+        assert module_names == ['testapi.resources.orders.resource',
+                                'testapi.resources.users.resource']
 
     def test_expand_wildcards_with_nonexistent_module_name(self):
         module_names = expand_wildcards('testapi.resources.users.*.resource')
@@ -86,8 +86,8 @@ class TestUtils(object):
     def test_expand_wildcards_package(self):
         module_names = expand_wildcards('testapi.resources.*')
         assert module_names == ['testapi.resources',
-                                'testapi.resources.users',
-                                'testapi.resources.orders']
+                                'testapi.resources.orders',
+                                'testapi.resources.users']
 
     def test_locked_cached_property(self):
         class Sample(object):
