@@ -27,10 +27,10 @@ setup(
     packages=find_packages(exclude=['tests']),
     url='https://github.com/RussellLuo/restart',
     install_requires=[
-        'six==1.9.0',
+        'six>=1.9.0',
         'Werkzeug>=0.9',
-        'click==4.0',
-        'python-easyconfig==0.1.6',
+        'click>=4.0',
+        'python-easyconfig>=0.1.6',
     ],
     entry_points={
         'console_scripts': [
